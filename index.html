@@ -1,172 +1,246 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>POS Kho Vải Pro</title>
-
-<style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;background:#f4f6f8;}
-header{background:linear-gradient(135deg,#111,#333);color:#fff;padding:12px;text-align:center;}
-
-.nav{display:flex;justify-content:space-around;background:#fff;padding:8px;font-size:12px;}
-.nav div{background:#eee;padding:6px 10px;border-radius:20px;cursor:pointer;}
-
-.container{padding:10px;}
-.card{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px;}
-
-input{width:100%;padding:8px;margin:4px 0;border:1px solid #ddd;border-radius:8px;}
-button{padding:8px;border:none;border-radius:8px;background:#111;color:#fff;}
-
-table{width:100%;border-collapse:collapse;font-size:12px;}
-td,th{padding:6px;border-bottom:1px solid #eee;}
-
-.section{display:none;}
-.active{display:block;}
-
-.bottom{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;}
-.bottom div{flex:1;text-align:center;padding:10px;font-size:12px;}
-.center{background:#111;color:#fff;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;position:relative;top:-15px;margin:auto;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản Lý Kho Vải Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: -apple-system, sans-serif; }
+        .card { border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .input-group label { display: block; font-size: 13px; color: #374151; margin-bottom: 4px; font-weight: 500; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-size: 14px; }
+        .input-group input:focus { border-color: #2563eb; ring: 1px #2563eb; }
+    </style>
 </head>
+<body class="pb-20">
 
-<body>
+    <header class="bg-white p-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <div>
+            <h1 class="text-lg font-bold">Xin chào, Đào Bích Thảo 👋</h1>
+            <p class="text-xs text-gray-500">Trạng thái: CQT đã chấp nhận</p>
+        </div>
+        <div class="flex gap-4">
+            <i class="fa-solid fa-magnifying-glass text-xl text-gray-600"></i>
+            <i class="fa-solid fa-bell text-xl text-gray-600"></i>
+        </div>
+    </header>
 
-<header>📦 POS Kho Vải Pro</header>
+    <main class="p-4">
+        
+        <section id="home" class="tab-content active">
+            <div class="bg-blue-50 p-4 rounded-xl mb-6 flex justify-between items-center border border-blue-100">
+                <span class="text-sm font-medium">Bạn chưa vào ca!</span>
+                <button class="bg-white text-blue-600 px-4 py-1.5 rounded-lg text-sm font-bold shadow-sm">Vào ca ngay!</button>
+            </div>
 
-<div class="nav">
-<div onclick="show('home')">Trang chủ</div>
-<div onclick="show('warehouse')">Kho</div>
-<div onclick="show('sell')">Bán</div>
-<div onclick="show('report')">Báo cáo</div>
-</div>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-white p-3 card text-center">
+                    <p class="text-[10px] text-gray-400 uppercase">Doanh thu</p>
+                    <p class="font-bold text-blue-700 text-lg" id="stat-revenue">0</p>
+                </div>
+                <div class="bg-white p-3 card text-center">
+                    <p class="text-[10px] text-gray-400 uppercase">Đơn hàng</p>
+                    <p class="font-bold text-orange-600 text-lg" id="stat-orders">0</p>
+                </div>
+                <div class="bg-white p-3 card text-center">
+                    <p class="text-[10px] text-gray-400 uppercase">Tồn kho (m)</p>
+                    <p class="font-bold text-teal-600 text-lg" id="stat-stock">0</p>
+                </div>
+            </div>
 
-<div class="container">
+            <div class="grid grid-cols-4 gap-y-6 gap-x-2 text-center text-[11px] font-medium text-gray-700">
+                <div onclick="switchTab('pos')" class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fa-solid fa-box"></i></div>
+                    <span>Quản lý sản phẩm</span>
+                </div>
+                <div onclick="switchTab('warehouse')" class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 text-xl shadow-sm"><i class="fa-solid fa-home"></i></div>
+                    <span>Kho</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 text-xl shadow-sm"><i class="fa-solid fa-chart-line"></i></div>
+                    <span>Báo cáo</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-xl shadow-sm"><i class="fa-solid fa-user-group"></i></div>
+                    <span>Nhân viên</span>
+                </div>
+            </div>
+        </section>
 
-<!-- HOME -->
-<div id="home" class="section active">
-<div class="card">
-<h3>Dashboard</h3>
-<p>Tổng sản phẩm: <span id="totalStock"></span></p>
-<p>Tổng đơn hàng: <span id="totalOrders"></span></p>
-</div>
-</div>
+        <section id="warehouse" class="tab-content">
+            <div class="flex items-center mb-4 gap-2">
+                <i class="fa-solid fa-chevron-left" onclick="switchTab('home')"></i>
+                <h2 class="text-lg font-bold">Tạo sản phẩm</h2>
+            </div>
 
-<!-- WAREHOUSE -->
-<div id="warehouse" class="section">
-<div class="card">
-<h3>Nhập kho</h3>
-<input id="name" placeholder="Tên"/>
-<input id="code" placeholder="Mã"/>
-<input id="color" placeholder="Màu"/>
-<input id="price" placeholder="Giá bán"/>
-<input id="qty" placeholder="Số mét"/>
-<button onclick="add()">Thêm</button>
-</div>
+            <div class="bg-white p-5 card space-y-4">
+                <div class="input-group">
+                    <label>Tên sản phẩm *</label>
+                    <input type="text" id="p-name" placeholder="Nhập tên sản phẩm">
+                </div>
 
-<div class="card">
-<h3>Kho hàng</h3>
-<table><tbody id="stock"></tbody></table>
-</div>
-</div>
+                <div class="input-group">
+                    <label>Tính chất *</label>
+                    <select id="p-type">
+                        <option>Thành phẩm</option>
+                        <option>Nguyên liệu</option>
+                    </select>
+                </div>
 
-<!-- SELL -->
-<div id="sell" class="section">
-<div class="card">
-<h3>Bán hàng (giỏ)</h3>
-<table><tbody id="cart"></tbody></table>
-<p>Tổng: <span id="total"></span></p>
-<button onclick="checkout()">Thanh toán</button>
-</div>
-</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label>Mã sản phẩm</label>
+                        <input type="text" id="p-sku" placeholder="Nhập mã">
+                    </div>
+                    <div class="input-group">
+                        <label>Mã vạch</label>
+                        <div class="relative">
+                            <input type="text" id="p-barcode" placeholder="Nhập mã vạch">
+                            <i class="fa-solid fa-barcode absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
 
-<!-- REPORT -->
-<div id="report" class="section">
-<div class="card">
-<h3>Hoá đơn</h3>
-<table><tbody id="orders"></tbody></table>
-</div>
-</div>
+                <div class="input-group">
+                    <label>Nhóm sản phẩm</label>
+                    <select id="p-group">
+                        <option>Chọn nhóm sản phẩm</option>
+                        <option>Vải dệt kim</option>
+                        <option>Vải dệt thoi</option>
+                    </select>
+                </div>
 
-</div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label>Giá nhập</label>
+                        <input type="number" id="p-cost" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Giá bán *</label>
+                        <input type="number" id="p-price" placeholder="0">
+                    </div>
+                </div>
 
-<script>
+                <div class="input-group">
+                    <label>Số lượng mét nhập kho *</label>
+                    <input type="number" id="p-stock" placeholder="0">
+                </div>
 
-let stock = JSON.parse(localStorage.getItem('stock')||'[]');
-let cart = [];
-let orders = JSON.parse(localStorage.getItem('orders')||'[]');
+                <div class="flex gap-3 pt-4">
+                    <button onclick="clearForm()" class="flex-1 py-3 border border-blue-600 text-blue-600 rounded-xl font-bold">Tạo thêm</button>
+                    <button onclick="addProduct()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">Lưu</button>
+                </div>
+            </div>
+        </section>
 
-function save(){
-localStorage.setItem('stock',JSON.stringify(stock));
-localStorage.setItem('orders',JSON.stringify(orders));
-}
+        <section id="pos" class="tab-content">
+            <div class="flex gap-2 mb-4 items-center">
+                <div class="relative flex-1">
+                    <input type="text" class="w-full p-2 pl-9 rounded-lg border bg-white" placeholder="Tìm kiếm">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="bg-blue-600 text-white p-2 rounded-lg w-10 h-10 flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+            </div>
+            <div id="product-list" class="space-y-3"></div>
+        </section>
 
-function add(){
-stock.push({
-name:name.value,
-code:code.value,
-color:color.value,
-price:+price.value,
-qty:+qty.value
-});
-save(); render();
-}
+    </main>
 
-function addToCart(i){
-if(stock[i].qty<=0) return;
-stock[i].qty--;
-cart.push(stock[i]);
-render();
-}
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 text-[10px] text-gray-400 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div onclick="switchTab('home')" class="nav-item active flex flex-col items-center gap-1 text-blue-600" id="nav-home">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span>Trang chủ</span>
+        </div>
+        <div onclick="switchTab('pos')" class="nav-item flex flex-col items-center gap-1" id="nav-pos">
+            <i class="fa-solid fa-cart-shopping text-xl"></i>
+            <span>Bán hàng</span>
+        </div>
+        <div onclick="switchTab('warehouse')" class="nav-item flex flex-col items-center gap-1" id="nav-warehouse">
+            <i class="fa-solid fa-box text-xl"></i>
+            <span>Sản phẩm</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+            <i class="fa-solid fa-user text-xl"></i>
+            <span>Cài đặt</span>
+        </div>
+    </nav>
 
-function checkout(){
-let total = cart.reduce((s,i)=>s+i.price,0);
-orders.push({items:cart,total,date:new Date().toLocaleString()});
-cart=[];
-save(); render();
-alert("Đã thanh toán");
-}
+    <script>
+        let db = JSON.parse(localStorage.getItem('khoVaiProData')) || { products: [], orders: [] };
 
-function render(){
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('text-blue-600'));
+            
+            document.getElementById(id).classList.add('active');
+            document.getElementById('nav-' + (id === 'home' || id === 'pos' || id === 'warehouse' ? id : 'home')).classList.add('text-blue-600');
+        }
 
-let st = document.getElementById('stock');
-st.innerHTML='';
-stock.forEach((i,idx)=>{
-st.innerHTML+=`
-<tr>
-<td>${i.name}</td>
-<td>${i.qty}</td>
-<td><button onclick="addToCart(${idx})">Bán</button></td>
-</tr>`;
-});
+        function addProduct() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const stock = document.getElementById('p-stock').value;
 
-let c = document.getElementById('cart');
-c.innerHTML='';
-let total=0;
-cart.forEach(i=>{
-total+=i.price;
-c.innerHTML+=`<tr><td>${i.name}</td><td>${i.price}</td></tr>`;
-});
-document.getElementById('total').innerText=total;
+            if (!name || !price || !stock) {
+                alert("Vui lòng nhập đầy đủ các thông tin có dấu *");
+                return;
+            }
 
-let o = document.getElementById('orders');
-o.innerHTML='';
-orders.forEach(i=>{
-o.innerHTML+=`<tr><td>${i.date}</td><td>${i.total}</td></tr>`;
-});
+            const newProduct = {
+                id: Date.now(),
+                name: name,
+                sku: document.getElementById('p-sku').value || 'N/A',
+                group: document.getElementById('p-group').value,
+                price: parseFloat(price),
+                stock: parseFloat(stock)
+            };
 
-document.getElementById('totalStock').innerText=stock.length;
-document.getElementById('totalOrders').innerText=orders.length;
-}
+            db.products.push(newProduct);
+            localStorage.setItem('khoVaiProData', JSON.stringify(db));
+            alert("Đã lưu sản phẩm thành công!");
+            renderProducts();
+            updateStats();
+            switchTab('pos');
+        }
 
-function show(id){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = db.products.map(p => `
+                <div class="bg-white p-4 card flex items-center gap-4 relative">
+                    <div class="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center text-blue-200">
+                        <i class="fa-solid fa-image text-3xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-800 text-sm">${p.name}</h4>
+                        <p class="text-xs text-gray-400">Có sẵn: <span class="text-gray-800 font-medium">${p.stock} m</span></p>
+                        <p class="text-blue-600 font-bold mt-1">${p.price.toLocaleString()} đ</p>
+                    </div>
+                    <button class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
 
-render();
+        function updateStats() {
+            const totalStock = db.products.reduce((sum, p) => sum + p.stock, 0);
+            document.getElementById('stat-stock').innerText = totalStock;
+        }
 
-</script>
+        function clearForm() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+        }
 
+        // Khởi tạo
+        renderProducts();
+        updateStats();
+    </script>
 </body>
 </html>
