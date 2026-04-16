@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quản Lý Kho Vải Pro</title>
+    <title>POS Kho Vải Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -31,16 +31,16 @@
 
     <main class="p-4">
         <section id="home" class="tab-content active">
-            <div class="grid grid-cols-3 gap-3 mb-6">
-                <div class="bg-white p-3 card text-center border-t-4 border-blue-500">
+            <div class="grid grid-cols-3 gap-3 mb-6 text-center">
+                <div class="bg-white p-3 card border-t-4 border-blue-500">
                     <p class="text-[10px] text-gray-400 uppercase font-bold">Doanh thu</p>
                     <p class="font-bold text-blue-700 text-lg" id="stat-revenue">0</p>
                 </div>
-                <div class="bg-white p-3 card text-center border-t-4 border-orange-500">
+                <div class="bg-white p-3 card border-t-4 border-orange-500">
                     <p class="text-[10px] text-gray-400 uppercase font-bold">Mã hàng</p>
                     <p class="font-bold text-orange-600 text-lg" id="stat-orders">0</p>
                 </div>
-                <div class="bg-white p-3 card text-center border-t-4 border-teal-500">
+                <div class="bg-white p-3 card border-t-4 border-teal-500">
                     <p class="text-[10px] text-gray-400 uppercase font-bold">Tổng tồn (m)</p>
                     <p class="font-bold text-teal-600 text-lg" id="stat-stock">0</p>
                 </div>
@@ -59,18 +59,6 @@
                     </div>
                     <span class="font-bold text-sm text-gray-700">Xem kho vải</span>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border flex flex-col items-center gap-3 opacity-50">
-                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-2xl">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <span class="font-bold text-sm text-gray-700">Báo cáo</span>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border flex flex-col items-center gap-3 opacity-50">
-                    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-2xl">
-                        <i class="fa-solid fa-gear"></i>
-                    </div>
-                    <span class="font-bold text-sm text-gray-700">Cài đặt</span>
-                </div>
             </div>
         </section>
 
@@ -83,21 +71,17 @@
             <div class="bg-white p-5 card space-y-5">
                 <div class="input-group">
                     <label>Tên vải/Mã hàng *</label>
-                    <input type="text" id="p-name" placeholder="Ví dụ: Thun lạnh 2 chiều">
+                    <input type="text" id="p-name" placeholder="Ví dụ: Tơ mềm">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
                         <label>Giá bán (/m) *</label>
-                        <input type="number" id="p-price" placeholder="Giá bán">
+                        <input type="text" id="p-price" placeholder="0" oninput="formatCurrency(this)">
                     </div>
                     <div class="input-group">
-                        <label>Nhóm hàng</label>
-                        <select id="p-group">
-                            <option>Dệt kim</option>
-                            <option>Dệt thoi</option>
-                            <option>Vải lót</option>
-                        </select>
+                        <label>Giá nhập (/m)</label>
+                        <input type="text" id="p-cost" placeholder="0" oninput="formatCurrency(this)">
                     </div>
                 </div>
 
@@ -145,12 +129,21 @@
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('khoVaiAdvanced')) || { products: [] };
+        let db = JSON.parse(localStorage.getItem('khoVaiV3')) || { products: [] };
 
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            window.scrollTo(0,0);
+        }
+
+        function formatCurrency(input) {
+            let value = input.value.replace(/\D/g, "");
+            input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function getRawNumber(id) {
+            const val = document.getElementById(id).value;
+            return parseFloat(val.replace(/\./g, "")) || 0;
         }
 
         function addColorRow() {
@@ -166,7 +159,7 @@
 
         function addProduct() {
             const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
+            const price = getRawNumber('p-price');
             const cNames = document.querySelectorAll('.c-name');
             const cQtys = document.querySelectorAll('.c-qty');
 
@@ -177,13 +170,13 @@
                 }
             });
 
-            if (!name || !price || colors.length === 0) {
-                alert("Vui lòng nhập Tên vải, Giá bán và ít nhất một Màu sắc!");
+            if (!name || price === 0 || colors.length === 0) {
+                alert("Vui lòng nhập đủ Tên, Giá bán và ít nhất một màu!");
                 return;
             }
 
-            db.products.push({ id: Date.now(), name, price: parseFloat(price), group: document.getElementById('p-group').value, colors });
-            localStorage.setItem('khoVaiAdvanced', JSON.stringify(db));
+            db.products.push({ id: Date.now(), name, price, colors });
+            localStorage.setItem('khoVaiV3', JSON.stringify(db));
             alert("Đã lưu thành công!");
             location.reload();
         }
@@ -191,19 +184,15 @@
         function renderProducts() {
             const list = document.getElementById('product-list');
             if (db.products.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">Chưa có sản phẩm nào trong kho</div>`;
+                list.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">Chưa có sản phẩm nào</div>`;
                 return;
             }
             list.innerHTML = db.products.map(p => `
                 <div class="bg-white p-4 card">
                     <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase">${p.group}</span>
-                            <h4 class="font-bold text-gray-800 mt-1">${p.name}</h4>
-                        </div>
+                        <h4 class="font-bold text-gray-800">${p.name}</h4>
                         <div class="text-right">
-                            <p class="text-blue-600 font-bold">${p.price.toLocaleString()}đ</p>
-                            <p class="text-[10px] text-gray-400">mỗi mét</p>
+                            <p class="text-blue-600 font-bold">${p.price.toLocaleString('vi-VN')}đ</p>
                         </div>
                     </div>
                     <div class="space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
@@ -214,8 +203,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="mt-3 flex justify-between items-center text-xs">
-                        <span class="text-gray-400 italic">Mã: #${p.id.toString().slice(-4)}</span>
+                    <div class="mt-3 text-right">
                         <span class="font-bold text-gray-700">TỔNG TỒN: ${p.colors.reduce((s, c) => s + c.qty, 0)} m</span>
                     </div>
                 </div>
@@ -225,7 +213,7 @@
         function updateStats() {
             let totalM = 0;
             db.products.forEach(p => p.colors.forEach(c => totalM += c.qty));
-            document.getElementById('stat-stock').innerText = totalM.toLocaleString();
+            document.getElementById('stat-stock').innerText = totalM.toLocaleString('vi-VN');
             document.getElementById('stat-orders').innerText = db.products.length;
         }
 
