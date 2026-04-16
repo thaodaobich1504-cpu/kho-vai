@@ -3,274 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quản Lý Kho Vải & Hoá Đơn - Thảo</title>
+    <title>Quản Lý Kho Vải Pro - Thảo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #f8fafc; font-family: -apple-system, sans-serif; }
-        .tab-content { display: none; padding-bottom: 120px; }
-        .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .nav-center-btn { width: 64px; height: 64px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -35px; border: 5px solid #fff; color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); z-index: 60; }
-        .input-style { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; font-size: 14px; margin-bottom: 10px; }
-        .input-style:focus { border-color: #2563eb; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .modal.active { display: flex; }
+        body { background-color: #f1f5f9; font-family: -apple-system, sans-serif; letter-spacing: -0.01em; }
+        .tab-content { display: none; padding-bottom: 140px; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-center-btn { width: 68px; height: 68px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -35px; border: 6px solid #f1f5f9; color: white; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); z-index: 60; }
+        .card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .input-label { display: block; font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; }
+        .input-field { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 16px; outline: none; font-size: 15px; transition: all 0.2s; background: #f8fafc; }
+        .input-field:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .btn-primary { background: #1e293b; color: white; padding: 16px; border-radius: 18px; font-weight: 800; width: 100%; transition: all 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .badge-blue { background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
     </style>
 </head>
 <body>
 
-    <header class="bg-white p-5 flex justify-between items-center sticky top-0 z-40 border-b border-gray-50">
+    <header class="bg-white/80 backdrop-blur-md p-5 flex justify-between items-center sticky top-0 z-50 border-b border-gray-100">
         <div>
-            <h1 class="text-xl font-black text-gray-900">Xin chào, Thảo 👋</h1>
-            <p class="text-[10px] text-blue-600 font-black uppercase tracking-widest">Hệ thống hoá đơn nội bộ</p>
+            <h1 class="text-xl font-black text-slate-900 tracking-tight">Vải Sợi Thảo</h1>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hệ thống v7.0 Ready</p>
+            </div>
         </div>
-        <i class="fa-solid fa-circle-user text-3xl text-blue-600"></i>
+        <div class="w-11 h-11 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 border border-slate-200">
+            <i class="fa-solid fa-user-tie"></i>
+        </div>
     </header>
 
     <main class="p-4">
         <section id="home" class="tab-content active">
-            <div class="grid grid-cols-3 gap-3 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
-                    <p class="text-[9px] text-gray-400 font-bold uppercase">Doanh thu</p>
-                    <p class="font-black text-blue-600" id="stat-revenue">0đ</p>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="card bg-slate-900 text-white border-none col-span-2 py-8 relative overflow-hidden">
+                    <p class="text-xs opacity-60 font-bold uppercase mb-1">Doanh thu tổng</p>
+                    <p class="text-4xl font-black" id="stat-revenue">0đ</p>
+                    <i class="fa-solid fa-wallet absolute right-6 top-1/2 -translate-y-1/2 text-white/10 text-6xl"></i>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
-                    <p class="text-[9px] text-gray-400 font-bold uppercase">Mã hàng</p>
-                    <p class="font-black text-orange-600" id="stat-count">0</p>
+                <div class="card">
+                    <p class="text-[10px] text-slate-400 font-black uppercase mb-1">Mã hàng</p>
+                    <p class="text-2xl font-black text-slate-800" id="stat-count">0</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center">
-                    <p class="text-[9px] text-gray-400 font-bold uppercase">Tổng tồn</p>
-                    <p class="font-black text-green-600" id="stat-stock">0m</p>
+                <div class="card border-l-4 border-l-blue-500">
+                    <p class="text-[10px] text-slate-400 font-black uppercase mb-1">Tồn kho (m)</p>
+                    <p class="text-2xl font-black text-slate-800" id="stat-stock">0</p>
                 </div>
             </div>
 
+            <h3 class="font-black text-slate-800 mb-4 px-1">Lối tắt nhanh</h3>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="switchTab('warehouse')" class="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-plus"></i></div>
-                    <span class="text-xs font-black text-gray-600 uppercase">Nhập hàng</span>
+                <button onclick="switchTab('warehouse')" class="card flex flex-col items-center gap-3 bg-blue-50 border-blue-100">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-blue-200"><i class="fa-solid fa-plus"></i></div>
+                    <span class="text-xs font-bold text-blue-700">NHẬP HÀNG</span>
                 </button>
-                <button onclick="switchTab('stock')" class="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-3">
-                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
-                    <span class="text-xs font-black text-gray-600 uppercase">Kho vải</span>
+                <button onclick="switchTab('stock')" class="card flex flex-col items-center gap-3 bg-orange-50 border-orange-100">
+                    <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-orange-200"><i class="fa-solid fa-warehouse"></i></div>
+                    <span class="text-xs font-bold text-orange-700">KHO VẢI</span>
                 </button>
             </div>
+        </section>
+
+        <section id="warehouse" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-slate-900">Nhập lô hàng</h2>
+                <button onclick="addVariantRow()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black">+ MÃ MỚI</button>
+            </div>
+            
+            <div class="card mb-4">
+                <label class="input-label">Tên loại vải chung *</label>
+                <input type="text" id="p-name" class="input-field" placeholder="Ví dụ: Lụa vân pháp">
+            </div>
+
+            <div id="variant-container" class="space-y-4">
+                <div class="card border-dashed border-2 border-slate-200 bg-slate-50/50">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="input-label">Mã hàng *</label>
+                            <input type="text" class="v-sku input-field" placeholder="M01">
+                        </div>
+                        <div>
+                            <label class="input-label">Màu sắc</label>
+                            <input type="text" class="v-color input-field" placeholder="Đỏ đô">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="input-label">Số mét</label>
+                            <input type="number" step="0.1" class="v-qty input-field" placeholder="0.0">
+                        </div>
+                        <div>
+                            <label class="input-label">Giá nhập</label>
+                            <input type="number" step="0.01" class="v-cost input-field" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="input-label">Giá bán</label>
+                            <input type="number" step="0.01" class="v-price input-field text-blue-600 font-bold" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveProduct()" class="btn-primary mt-6 shadow-xl shadow-slate-200">XÁC NHẬN LƯU KHO</button>
         </section>
 
         <section id="pos" class="tab-content">
-            <h2 class="text-xl font-black mb-5 italic">Lập hoá đơn bán hàng</h2>
-            <div class="relative mb-6">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
-                <input type="text" onkeyup="renderPOS(this.value)" placeholder="Tìm mã hoặc màu..." class="w-full bg-white border border-gray-100 p-4 pl-12 rounded-2xl outline-none shadow-sm">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-2xl font-black text-slate-900">Bán hàng</h2>
+                <div class="relative">
+                    <i class="fa-solid fa-cart-shopping text-2xl text-slate-300"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black">0</span>
+                </div>
             </div>
+            
+            <input type="text" onkeyup="renderPOS(this.value)" placeholder="Tìm mã hàng hoặc màu sắc..." class="input-field mb-6 shadow-sm border-none ring-1 ring-slate-200">
+
             <div id="pos-list" class="space-y-3"></div>
+
+            <div id="checkout-bar" class="hidden fixed bottom-28 left-4 right-4 bg-white p-5 rounded-3xl shadow-2xl border border-slate-100 flex justify-between items-center z-50">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Tổng tiền hoá đơn</p>
+                    <p id="cart-total" class="text-xl font-black text-blue-600">0đ</p>
+                </div>
+                <button onclick="openCheckoutModal()" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-sm">THANH TOÁN</button>
+            </div>
         </section>
 
         <section id="stock" class="tab-content">
-            <h2 class="text-xl font-black mb-5">Kiểm kê tồn kho</h2>
+            <h2 class="text-2xl font-black text-slate-900 mb-6">Kiểm kho</h2>
             <div id="stock-list" class="space-y-3"></div>
         </section>
 
         <section id="report" class="tab-content">
-            <h2 class="text-xl font-black mb-5">Báo cáo & Lợi nhuận</h2>
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-6">
-                <div class="flex justify-between border-b pb-3 mb-3">
-                    <span class="text-gray-500 font-bold uppercase text-[10px]">Tổng doanh thu:</span>
-                    <span class="font-black text-blue-600" id="rep-revenue">0đ</span>
+            <h2 class="text-2xl font-black text-slate-900 mb-6">Báo cáo</h2>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="card bg-white border-l-4 border-l-green-500">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Lợi nhuận ước tính</p>
+                    <p id="rep-profit" class="text-xl font-black text-green-600">0đ</p>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-900 font-black italic">LỢI NHUẬN:</span>
-                    <span class="font-black text-green-600 text-lg" id="rep-profit">0đ</span>
+                <div class="card bg-white border-l-4 border-l-blue-500">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Tổng thu</p>
+                    <p id="rep-revenue" class="text-xl font-black text-blue-600">0đ</p>
                 </div>
             </div>
-            <h3 class="font-black text-gray-400 text-[10px] uppercase mb-3">Lịch sử hoá đơn</h3>
-            <div id="sale-history" class="space-y-3"></div>
-        </section>
-
-        <section id="warehouse" class="tab-content">
-            <h2 class="text-xl font-black mb-5">Nhập kho hàng</h2>
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 space-y-4 shadow-sm">
-                <input type="text" id="p-name" class="input-style" placeholder="Tên loại vải (Ví dụ: Lụa)">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="p-sku" class="input-style" placeholder="Mã hàng">
-                    <input type="text" id="p-color" class="input-style" placeholder="Màu sắc">
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <input type="number" id="p-qty" class="input-style" placeholder="Số mét">
-                    <input type="number" id="p-cost" class="input-style" placeholder="Giá nhập">
-                    <input type="number" id="p-price" class="input-style" placeholder="Giá bán">
-                </div>
-                <button onclick="saveProduct()" class="w-full py-4 bg-gray-900 text-white rounded-2xl font-black shadow-xl">XÁC NHẬN NHẬP KHO</button>
-            </div>
+            <h3 class="font-black text-slate-800 mb-4 uppercase text-xs tracking-widest">Lịch sử giao dịch</h3>
+            <div id="sale-history" class="space-y-4"></div>
         </section>
     </main>
 
-    <div id="invoice-modal" class="modal">
-        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-            <h3 class="text-lg font-black mb-4 flex items-center gap-2"><i class="fa-solid fa-file-invoice text-blue-600"></i> Thông tin hoá đơn</h3>
-            <div id="invoice-item-info" class="bg-blue-50 p-3 rounded-xl mb-4 text-xs font-bold text-blue-700"></div>
-            <label class="text-[10px] font-bold text-gray-400 uppercase">Khách hàng</label>
-            <input type="text" id="cust-name" class="input-style" placeholder="Tên khách hàng">
-            <label class="text-[10px] font-bold text-gray-400 uppercase">Số điện thoại</label>
-            <input type="tel" id="cust-phone" class="input-style" placeholder="Số điện thoại">
-            <label class="text-[10px] font-bold text-gray-400 uppercase">Số mét mua</label>
-            <input type="number" id="cust-qty" class="input-style" placeholder="0">
-            
-            <div class="flex gap-2 mt-4">
-                <button onclick="closeInvoice()" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold">Huỷ</button>
-                <button onclick="confirmSale()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-100">XUẤT HOÁ ĐƠN</button>
+    <div id="modal-checkout" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-end sm:items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-t-[40px] sm:rounded-[40px] p-8 animate-slide-up">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <h3 class="text-2xl font-black text-slate-900 mb-6">Thông tin khách hàng</h3>
+            <div class="space-y-4 mb-8">
+                <div>
+                    <label class="input-label">Tên khách hàng</label>
+                    <input type="text" id="cust-name" class="input-field" placeholder="Nhập tên khách...">
+                </div>
+                <div>
+                    <label class="input-label">Số điện thoại</label>
+                    <input type="tel" id="cust-phone" class="input-field" placeholder="090...">
+                </div>
+            </div>
+            <div id="order-summary" class="bg-slate-50 p-6 rounded-3xl mb-8 space-y-2"></div>
+            <div class="flex gap-3">
+                <button onclick="closeModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black">HUỶ</button>
+                <button onclick="confirmCheckout()" class="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-100">HOÀN TẤT BÁN HÀNG</button>
             </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around items-center p-3 pb-8 z-50">
-        <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 text-blue-600 nav-btn" id="nav-home">
-            <i class="fa-solid fa-house-user text-xl"></i>
-            <span class="text-[9px] font-black uppercase">Trang chủ</span>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-100 flex justify-around items-center p-4 pb-10 z-[70]">
+        <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 text-blue-600 nav-item" id="nav-home">
+            <i class="fa-solid fa-house-chimney text-xl"></i>
+            <span class="text-[9px] font-black uppercase">Chủ</span>
         </button>
-        <button onclick="switchTab('stock')" class="flex flex-col items-center gap-1 text-gray-300 nav-btn" id="nav-stock">
-            <i class="fa-solid fa-warehouse text-xl"></i>
+        <button onclick="switchTab('stock')" class="flex flex-col items-center gap-1 text-slate-300 nav-item" id="nav-stock">
+            <i class="fa-solid fa-boxes-stacked text-xl"></i>
             <span class="text-[9px] font-black uppercase">Kho</span>
         </button>
         <button onclick="switchTab('pos')" class="nav-center-btn"><i class="fa-solid fa-cart-shopping text-2xl"></i></button>
-        <button onclick="switchTab('warehouse')" class="flex flex-col items-center gap-1 text-gray-300 nav-btn" id="nav-warehouse">
-            <i class="fa-solid fa-square-plus text-xl"></i>
+        <button onclick="switchTab('warehouse')" class="flex flex-col items-center gap-1 text-slate-300 nav-item" id="nav-warehouse">
+            <i class="fa-solid fa-circle-plus text-xl"></i>
             <span class="text-[9px] font-black uppercase">Nhập</span>
         </button>
-        <button onclick="switchTab('report')" class="flex flex-col items-center gap-1 text-gray-300 nav-btn" id="nav-report">
-            <i class="fa-solid fa-chart-line text-xl"></i>
-            <span class="text-[9px] font-black uppercase">Báo cáo</span>
+        <button onclick="switchTab('report')" class="flex flex-col items-center gap-1 text-slate-300 nav-item" id="nav-report">
+            <i class="fa-solid fa-chart-pie text-xl"></i>
+            <span class="text-[9px] font-black uppercase">Số</span>
         </button>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('kho_vai_v6')) || { products: [], sales: [] };
-        let currentSellingId = null;
+        let db = JSON.parse(localStorage.getItem('kho_vai_v7')) || { products: [], sales: [] };
+        let cart = [];
 
         function saveDB() {
-            localStorage.setItem('kho_vai_v6', JSON.stringify(db));
+            localStorage.setItem('kho_vai_v7', JSON.stringify(db));
             updateStats();
         }
 
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.replace('text-blue-600', 'text-gray-300'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.replace('text-blue-600', 'text-slate-300'));
             const activeNav = document.getElementById('nav-' + id);
-            if(activeNav) activeNav.classList.replace('text-gray-300', 'text-blue-600');
-
+            if(activeNav) activeNav.classList.replace('text-slate-300', 'text-blue-600');
+            
             if(id === 'pos') renderPOS();
             if(id === 'stock') renderStock();
             if(id === 'report') renderReport();
         }
 
-        function saveProduct() {
-            const name = document.getElementById('p-name').value;
-            const sku = document.getElementById('p-sku').value;
-            const color = document.getElementById('p-color').value;
-            const qty = parseFloat(document.getElementById('p-qty').value) || 0;
-            const cost = parseFloat(document.getElementById('p-cost').value) || 0;
-            const price = parseFloat(document.getElementById('p-price').value) || 0;
-
-            if(!name || !sku) return alert("Vui lòng nhập đủ thông tin!");
-
-            db.products.push({ id: Date.now(), name, sku, color, qty, cost, price });
-            saveDB();
-            alert("Đã nhập kho!");
-            switchTab('stock');
+        function addVariantRow() {
+            const container = document.getElementById('variant-container');
+            const div = document.createElement('div');
+            div.className = 'card border-dashed border-2 border-slate-200 bg-slate-50/50 relative';
+            div.innerHTML = `
+                <button onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-lg"><i class="fa-solid fa-x"></i></button>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div><label class="input-label">Mã hàng *</label><input type="text" class="v-sku input-field"></div>
+                    <div><label class="input-label">Màu sắc</label><input type="text" class="v-color input-field"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div><label class="input-label">Số mét</label><input type="number" step="0.1" class="v-qty input-field"></div>
+                    <div><label class="input-label">Giá nhập</label><input type="number" step="0.01" class="v-cost input-field"></div>
+                    <div><label class="input-label">Giá bán</label><input type="number" step="0.01" class="v-price input-field text-blue-600 font-bold"></div>
+                </div>`;
+            container.appendChild(div);
         }
 
-        function renderStock() {
-            const list = document.getElementById('stock-list');
-            list.innerHTML = db.products.map(p => `
-                <div class="bg-white p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] font-black text-blue-500 uppercase">${p.name}</p>
-                        <p class="font-black text-gray-800">${p.sku} - ${p.color}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-black text-blue-600">${p.qty}m</p>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase">${p.price.toLocaleString()}đ/m</p>
-                    </div>
-                </div>`).join('');
+        function saveProduct() {
+            const name = document.getElementById('p-name').value;
+            const skus = document.querySelectorAll('.v-sku');
+            const colors = document.querySelectorAll('.v-color');
+            const qtys = document.querySelectorAll('.v-qty');
+            const costs = document.querySelectorAll('.v-cost');
+            const prices = document.querySelectorAll('.v-price');
+
+            if (!name) return alert("Vui lòng nhập tên loại vải!");
+
+            skus.forEach((s, i) => {
+                if (s.value) {
+                    db.products.push({
+                        id: Date.now() + i,
+                        pName: name,
+                        sku: s.value,
+                        color: colors[i].value,
+                        qty: parseFloat(qtys[i].value) || 0,
+                        cost: parseFloat(costs[i].value) || 0,
+                        price: parseFloat(prices[i].value) || 0
+                    });
+                }
+            });
+
+            saveDB();
+            alert("Đã lưu hàng thành công!");
+            location.reload();
         }
 
         function renderPOS(filter = '') {
             const list = document.getElementById('pos-list');
             const filtered = db.products.filter(p => p.sku.toLowerCase().includes(filter.toLowerCase()) || p.color.toLowerCase().includes(filter.toLowerCase()));
+            
             list.innerHTML = filtered.map(p => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-gray-50">
+                <div class="card flex justify-between items-center bg-white border-slate-100">
                     <div>
-                        <p class="text-[10px] font-black text-blue-500 uppercase">${p.name}</p>
-                        <p class="font-black text-gray-900">${p.sku} - ${p.color}</p>
-                        <p class="text-[10px] text-gray-400 font-bold">Còn tồn: ${p.qty}m</p>
+                        <div class="badge-blue mb-1 inline-block">${p.pName}</div>
+                        <p class="font-black text-slate-900">${p.sku} - ${p.color}</p>
+                        <p class="text-xs font-bold text-slate-400">Tồn: ${p.qty}m</p>
                     </div>
-                    <button onclick="openInvoice(${p.id})" class="bg-blue-600 text-white px-5 py-2 rounded-xl font-black text-xs shadow-lg">BÁN</button>
+                    <div class="text-right">
+                        <p class="font-black text-slate-900 mb-2">${p.price.toLocaleString()}đ</p>
+                        <button onclick="addToCart(${p.id})" class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>`).join('') || '<p class="text-center text-slate-400 py-10">Không tìm thấy mã này</p>';
+        }
+
+        function addToCart(id) {
+            const p = db.products.find(x => x.id === id);
+            const m = prompt(`Nhập số mét muốn bán cho [${p.sku}]:`, "1");
+            const qtySell = parseFloat(m);
+
+            if (isNaN(qtySell) || qtySell <= 0) return;
+            if (qtySell > p.qty) return alert("Kho chỉ còn " + p.qty + "m!");
+
+            cart.push({ ...p, sellQty: qtySell, total: qtySell * p.price });
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const bar = document.getElementById('checkout-bar');
+            const totalEl = document.getElementById('cart-total');
+            const countEl = document.getElementById('cart-count');
+            
+            if (cart.length > 0) {
+                bar.classList.remove('hidden');
+                let sum = cart.reduce((a, b) => a + b.total, 0);
+                totalEl.innerText = sum.toLocaleString() + 'đ';
+                countEl.innerText = cart.length;
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function openCheckoutModal() {
+            document.getElementById('modal-checkout').style.display = 'flex';
+            const summary = document.getElementById('order-summary');
+            summary.innerHTML = cart.map(item => `
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-bold text-slate-600">${item.sku} (${item.sellQty}m)</span>
+                    <span class="font-black text-slate-900">${item.total.toLocaleString()}đ</span>
+                </div>`).join('');
+            summary.innerHTML += `<div class="border-t border-slate-200 mt-3 pt-3 flex justify-between font-black text-lg"><span>TỔNG:</span><span class="text-blue-600">${cart.reduce((a,b)=>a+b.total, 0).toLocaleString()}đ</span></div>`;
+        }
+
+        function confirmCheckout() {
+            const name = document.getElementById('cust-name').value || "Khách lẻ";
+            const phone = document.getElementById('cust-phone').value || "Trống";
+            
+            const saleOrder = {
+                id: Date.now(),
+                customer: name,
+                phone: phone,
+                items: [...cart],
+                totalRevenue: cart.reduce((a, b) => a + b.total, 0),
+                totalCost: cart.reduce((a, b) => a + (b.sellQty * b.cost), 0),
+                date: new Date().toLocaleString('vi-VN')
+            };
+
+            // Trừ kho thực tế
+            cart.forEach(item => {
+                const prod = db.products.find(p => p.id === item.id);
+                if (prod) prod.qty = Math.round((prod.qty - item.sellQty) * 100) / 100;
+            });
+
+            db.sales.unshift(saleOrder);
+            saveDB();
+            
+            alert("Đã hoàn tất hoá đơn!");
+            cart = [];
+            updateCartUI();
+            closeModal();
+            switchTab('report');
+        }
+
+        function closeModal() { document.getElementById('modal-checkout').style.display = 'none'; }
+
+        function renderReport() {
+            let rev = 0, profit = 0;
+            db.sales.forEach(s => { rev += s.totalRevenue; profit += (s.totalRevenue - s.totalCost); });
+            document.getElementById('rep-revenue').innerText = rev.toLocaleString() + 'đ';
+            document.getElementById('rep-profit').innerText = profit.toLocaleString() + 'đ';
+
+            document.getElementById('sale-history').innerHTML = db.sales.map(s => `
+                <div class="card bg-white border-slate-100">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="text-xs font-black text-blue-600 uppercase">Khách: ${s.customer}</p>
+                            <p class="text-[10px] text-slate-400 font-bold">${s.phone}</p>
+                        </div>
+                        <span class="text-[10px] bg-slate-100 px-2 py-1 rounded-md text-slate-500 font-bold">${s.date}</span>
+                    </div>
+                    <div class="space-y-1 mb-3">
+                        ${s.items.map(i => `<p class="text-xs font-medium text-slate-600">• ${i.sku} - ${i.color} (${i.sellQty}m)</p>`).join('')}
+                    </div>
+                    <div class="flex justify-between items-center border-t pt-3">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Tổng thu</span>
+                        <span class="text-lg font-black text-slate-900">${s.totalRevenue.toLocaleString()}đ</span>
+                    </div>
                 </div>`).join('');
         }
 
-        function openInvoice(id) {
-            currentSellingId = id;
-            const p = db.products.find(x => x.id === id);
-            document.getElementById('invoice-item-info').innerText = `Mã: ${p.sku} | Màu: ${p.color} | Giá: ${p.price.toLocaleString()}đ/m`;
-            document.getElementById('invoice-modal').classList.add('active');
-        }
-
-        function closeInvoice() {
-            document.getElementById('invoice-modal').classList.remove('active');
-            document.getElementById('cust-name').value = '';
-            document.getElementById('cust-phone').value = '';
-            document.getElementById('cust-qty').value = '';
-        }
-
-        function confirmSale() {
-            const p = db.products.find(x => x.id === currentSellingId);
-            const name = document.getElementById('cust-name').value || "Khách lẻ";
-            const phone = document.getElementById('cust-phone').value || "Không có";
-            const qtySell = parseFloat(document.getElementById('cust-qty').value);
-
-            if(isNaN(qtySell) || qtySell <= 0) return alert("Nhập số mét hợp lệ!");
-            if(qtySell > p.qty) return alert("Kho không đủ hàng!");
-
-            p.qty -= qtySell;
-            const revenue = qtySell * p.price;
-            const profit = revenue - (qtySell * p.cost);
-
-            db.sales.unshift({
-                customer: name,
-                phone: phone,
-                sku: p.sku,
-                color: p.color,
-                qty: qtySell,
-                total: revenue,
-                profit: profit,
-                date: new Date().toLocaleString('vi-VN')
-            });
-
-            saveDB();
-            closeInvoice();
-            alert("Đã xuất hoá đơn thành công!");
-            renderPOS();
-        }
-
-        function renderReport() {
-            let rev = 0, prof = 0;
-            db.sales.forEach(s => { rev += s.total; prof += s.profit; });
-            document.getElementById('rep-revenue').innerText = rev.toLocaleString() + 'đ';
-            document.getElementById('rep-profit').innerText = prof.toLocaleString() + 'đ';
-
-            document.getElementById('sale-history').innerHTML = db.sales.map(s => `
-                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="text-[10px] font-black text-blue-500 uppercase">Khách: ${s.customer}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">${s.phone}</p>
-                        </div>
-                        <p class="text-[10px] text-gray-300 font-bold">${s.date}</p>
+        function renderStock() {
+            document.getElementById('stock-list').innerHTML = db.products.map(p => `
+                <div class="card flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-600 uppercase">${p.pName}</p>
+                        <p class="font-black text-slate-900">${p.sku} - ${p.color}</p>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <p class="font-black text-gray-800 text-sm">${s.sku} - ${s.color} (${s.qty}m)</p>
-                        <p class="font-black text-blue-600 text-sm">+${s.total.toLocaleString()}đ</p>
+                    <div class="text-right">
+                        <p class="text-xl font-black ${p.qty < 5 ? 'text-red-500' : 'text-slate-900'}">${p.qty}m</p>
+                        <p class="text-[10px] font-black text-slate-400">GIÁ BÁN: ${p.price.toLocaleString()}đ</p>
                     </div>
                 </div>`).join('');
         }
@@ -278,8 +394,8 @@
         function updateStats() {
             let totalM = 0, totalRev = 0;
             db.products.forEach(p => totalM += p.qty);
-            db.sales.forEach(s => totalRev += s.total);
-            document.getElementById('stat-stock').innerText = totalM.toLocaleString() + 'm';
+            db.sales.forEach(s => totalRev += s.totalRevenue);
+            document.getElementById('stat-stock').innerText = Math.round(totalM * 10) / 10;
             document.getElementById('stat-count').innerText = db.products.length;
             document.getElementById('stat-revenue').innerText = totalRev.toLocaleString() + 'đ';
         }
