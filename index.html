@@ -1,269 +1,171 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kho Vải Pro</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>POS Kho Vải Pro</title>
 
 <style>
-body{
-    font-family: Arial;
-    margin:0;
-    background:#f4f6ff;
-}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;background:#f4f6f8;}
+header{background:linear-gradient(135deg,#111,#333);color:#fff;padding:12px;text-align:center;}
 
-header{
-    background:#6C63FF;
-    color:white;
-    padding:15px;
-    text-align:center;
-    font-size:20px;
-    font-weight:bold;
-}
+.nav{display:flex;justify-content:space-around;background:#fff;padding:8px;font-size:12px;}
+.nav div{background:#eee;padding:6px 10px;border-radius:20px;cursor:pointer;}
 
-.container{
-    padding:10px;
-}
+.container{padding:10px;}
+.card{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px;}
 
-.card{
-    background:white;
-    padding:10px;
-    margin-bottom:10px;
-    border-radius:10px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
+input{width:100%;padding:8px;margin:4px 0;border:1px solid #ddd;border-radius:8px;}
+button{padding:8px;border:none;border-radius:8px;background:#111;color:#fff;}
 
-input,button,select{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    margin-bottom:10px;
-    border-radius:8px;
-    border:1px solid #ddd;
-}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+td,th{padding:6px;border-bottom:1px solid #eee;}
 
-button{
-    background:#6C63FF;
-    color:white;
-    border:none;
-}
+.section{display:none;}
+.active{display:block;}
 
-.item{
-    padding:10px;
-    border-bottom:1px solid #eee;
-}
-
-.small{
-    font-size:12px;
-    color:gray;
-}
-
-.row{
-    display:flex;
-    gap:5px;
-}
-.row button{
-    flex:1;
-}
+.bottom{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;}
+.bottom div{flex:1;text-align:center;padding:10px;font-size:12px;}
+.center{background:#111;color:#fff;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;position:relative;top:-15px;margin:auto;}
 </style>
 </head>
 
 <body>
 
-<header>🧵 Kho Vải Pro</header>
+<header>📦 POS Kho Vải Pro</header>
+
+<div class="nav">
+<div onclick="show('home')">Trang chủ</div>
+<div onclick="show('warehouse')">Kho</div>
+<div onclick="show('sell')">Bán</div>
+<div onclick="show('report')">Báo cáo</div>
+</div>
 
 <div class="container">
 
+<!-- HOME -->
+<div id="home" class="section active">
 <div class="card">
-<h3>Thêm vải</h3>
-<input id="name" placeholder="Tên vải">
-<input id="price" type="number" placeholder="Giá / mét">
-<input id="stock" type="number" placeholder="Số mét ban đầu">
-<button onclick="addProduct()">Thêm</button>
+<h3>Dashboard</h3>
+<p>Tổng sản phẩm: <span id="totalStock"></span></p>
+<p>Tổng đơn hàng: <span id="totalOrders"></span></p>
+</div>
 </div>
 
-<div class="card">
-<h3>Tìm kiếm</h3>
-<input id="search" placeholder="Nhập tên vải..." oninput="render()">
-</div>
-
+<!-- WAREHOUSE -->
+<div id="warehouse" class="section">
 <div class="card">
 <h3>Nhập kho</h3>
-<select id="importSelect"></select>
-<input id="importQty" type="number" step="0.01">
-<button onclick="importStock()">Nhập</button>
+<input id="name" placeholder="Tên"/>
+<input id="code" placeholder="Mã"/>
+<input id="color" placeholder="Màu"/>
+<input id="price" placeholder="Giá bán"/>
+<input id="qty" placeholder="Số mét"/>
+<button onclick="add()">Thêm</button>
 </div>
 
 <div class="card">
-<h3>Bán hàng</h3>
-<select id="sellSelect"></select>
-<input id="sellQty" type="number" step="0.01">
-<button onclick="sellStock()">Bán</button>
+<h3>Kho hàng</h3>
+<table><tbody id="stock"></tbody></table>
+</div>
 </div>
 
+<!-- SELL -->
+<div id="sell" class="section">
 <div class="card">
-<h3>Danh sách kho</h3>
-<div id="list"></div>
-<h4 id="total"></h4>
+<h3>Bán hàng (giỏ)</h3>
+<table><tbody id="cart"></tbody></table>
+<p>Tổng: <span id="total"></span></p>
+<button onclick="checkout()">Thanh toán</button>
+</div>
 </div>
 
+<!-- REPORT -->
+<div id="report" class="section">
 <div class="card">
-<h3>Lịch sử</h3>
-<div id="history"></div>
+<h3>Hoá đơn</h3>
+<table><tbody id="orders"></tbody></table>
 </div>
-
-<div class="card">
-<button onclick="exportData()">📥 Backup dữ liệu</button>
 </div>
 
 </div>
 
 <script>
-let products = JSON.parse(localStorage.getItem("khovai") || "[]");
-let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+let stock = JSON.parse(localStorage.getItem('stock')||'[]');
+let cart = [];
+let orders = JSON.parse(localStorage.getItem('orders')||'[]');
 
 function save(){
-    localStorage.setItem("khovai", JSON.stringify(products));
-    localStorage.setItem("history", JSON.stringify(history));
+localStorage.setItem('stock',JSON.stringify(stock));
+localStorage.setItem('orders',JSON.stringify(orders));
+}
+
+function add(){
+stock.push({
+name:name.value,
+code:code.value,
+color:color.value,
+price:+price.value,
+qty:+qty.value
+});
+save(); render();
+}
+
+function addToCart(i){
+if(stock[i].qty<=0) return;
+stock[i].qty--;
+cart.push(stock[i]);
+render();
+}
+
+function checkout(){
+let total = cart.reduce((s,i)=>s+i.price,0);
+orders.push({items:cart,total,date:new Date().toLocaleString()});
+cart=[];
+save(); render();
+alert("Đã thanh toán");
 }
 
 function render(){
-    let list = document.getElementById("list");
-    let sell = document.getElementById("sellSelect");
-    let imp = document.getElementById("importSelect");
-    let search = document.getElementById("search").value.toLowerCase();
 
-    list.innerHTML = "";
-    sell.innerHTML = "";
-    imp.innerHTML = "";
+let st = document.getElementById('stock');
+st.innerHTML='';
+stock.forEach((i,idx)=>{
+st.innerHTML+=`
+<tr>
+<td>${i.name}</td>
+<td>${i.qty}</td>
+<td><button onclick="addToCart(${idx})">Bán</button></td>
+</tr>`;
+});
 
-    let totalValue = 0;
+let c = document.getElementById('cart');
+c.innerHTML='';
+let total=0;
+cart.forEach(i=>{
+total+=i.price;
+c.innerHTML+=`<tr><td>${i.name}</td><td>${i.price}</td></tr>`;
+});
+document.getElementById('total').innerText=total;
 
-    products.forEach((p, i) => {
+let o = document.getElementById('orders');
+o.innerHTML='';
+orders.forEach(i=>{
+o.innerHTML+=`<tr><td>${i.date}</td><td>${i.total}</td></tr>`;
+});
 
-        if(!p.name.toLowerCase().includes(search)) return;
-
-        totalValue += p.stock * p.price;
-
-        list.innerHTML += `
-        <div class="item">
-            <b>${p.name}</b><br>
-            <span class="small">Tồn: ${p.stock.toFixed(2)} m | Giá: ${p.price}</span>
-            <div class="row">
-                <button onclick="edit(${i})">Sửa</button>
-                <button onclick="removeItem(${i})">Xoá</button>
-            </div>
-        </div>`;
-
-        sell.innerHTML += `<option value="${i}">${p.name}</option>`;
-        imp.innerHTML += `<option value="${i}">${p.name}</option>`;
-    });
-
-    document.getElementById("total").innerText = 
-        "💰 Tổng giá trị kho: " + totalValue.toFixed(0);
-
-    renderHistory();
+document.getElementById('totalStock').innerText=stock.length;
+document.getElementById('totalOrders').innerText=orders.length;
 }
 
-function renderHistory(){
-    let box = document.getElementById("history");
-    box.innerHTML = "";
-
-    history.slice().reverse().forEach(h=>{
-        box.innerHTML += `<div class="small">
-        ${h.time} - ${h.text}
-        </div>`;
-    });
-}
-
-function addProduct(){
-    let name = document.getElementById("name").value;
-    let price = parseFloat(document.getElementById("price").value);
-    let stock = parseFloat(document.getElementById("stock").value);
-
-    if(!name || isNaN(price) || isNaN(stock)) return;
-
-    products.push({name, price, stock});
-    history.push({time:new Date().toLocaleString(), text:"Thêm "+name});
-
-    save();
-    render();
-}
-
-function importStock(){
-    let i = document.getElementById("importSelect").value;
-    let qty = parseFloat(document.getElementById("importQty").value);
-
-    if(isNaN(qty)) return;
-
-    products[i].stock += qty;
-
-    history.push({
-        time:new Date().toLocaleString(),
-        text:"Nhập "+products[i].name+" +"+qty+"m"
-    });
-
-    save();
-    render();
-}
-
-function sellStock(){
-    let i = document.getElementById("sellSelect").value;
-    let qty = parseFloat(document.getElementById("sellQty").value);
-
-    if(isNaN(qty)) return;
-
-    if(products[i].stock < qty){
-        alert("Không đủ hàng!");
-        return;
-    }
-
-    products[i].stock -= qty;
-
-    let total = qty * products[i].price;
-
-    history.push({
-        time:new Date().toLocaleString(),
-        text:"Bán "+products[i].name+" -"+qty+"m = "+total
-    });
-
-    alert("Tổng tiền: " + total.toFixed(0));
-
-    save();
-    render();
-}
-
-function removeItem(i){
-    if(confirm("Xoá sản phẩm?")){
-        products.splice(i,1);
-        save();
-        render();
-    }
-}
-
-function edit(i){
-    let p = products[i];
-    let name = prompt("Tên", p.name);
-    let price = prompt("Giá", p.price);
-
-    if(name && price){
-        p.name = name;
-        p.price = parseFloat(price);
-        save();
-        render();
-    }
-}
-
-function exportData(){
-    let data = JSON.stringify({products, history});
-    let blob = new Blob([data], {type:"application/json"});
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "kho-vai.json";
-    a.click();
+function show(id){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
 
 render();
+
 </script>
 
 </body>
