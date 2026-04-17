@@ -1,271 +1,234 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quản Lý Kho Vải - Đào Bích Thảo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        .hidden { display: none; }
-        .active-tab { color: #2563eb; }
-        .modal-bg { background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
-        input[type="number"]::-webkit-inner-spin-button { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kho Vải PRO MAX</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f5f7fb;}
+.header{padding:15px;font-size:18px;font-weight:bold;}
+.card{background:white;margin:10px;padding:15px;border-radius:12px;}
+input,select{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #ddd;}
+button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#2f80ed;color:white;font-weight:bold;}
+.item{border-bottom:1px solid #eee;padding:8px 0;}
+.bottom{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:white;padding:10px 0;border-top:1px solid #ddd;}
+.center{background:#2f80ed;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;top:-20px;}
+.hidden{display:none;}
+.small{font-size:12px;color:gray;}
+</style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-900 pb-24">
 
-    <div id="app" class="max-w-md mx-auto min-h-screen bg-[#F8FAFC] relative">
-        
-        <div id="page-home" class="page-content">
-            <header class="bg-white p-5 flex justify-between items-center shadow-sm">
-                <div>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Cửa hàng vải</p>
-                    <h1 class="text-xl font-bold">Bích Thảo 👋</h1>
-                </div>
-                <div class="flex gap-4 text-xl"><span>🔍</span><span>🔔</span></div>
-            </header>
+<body>
 
-            <div class="p-4 space-y-4">
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] text-slate-400 font-black uppercase">Doanh thu hôm nay</p>
-                        <p id="stat-revenue" class="text-2xl font-black text-blue-600">0đ</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] text-slate-400 font-black uppercase">Mét đã bán</p>
-                        <p id="stat-meters" class="text-xl font-bold text-slate-800">0m</p>
-                    </div>
-                </div>
+<div id="home">
+<div class="header">Dashboard</div>
+<div class="card">
+Hôm nay: <b id="today">0</b><br>
+Tháng: <b id="month">0</b><br>
+Lãi: <b id="profit">0</b>
+</div>
+</div>
 
-                <div class="grid grid-cols-4 gap-4">
-                    <div onclick="showPage('stock')" class="bg-white aspect-square rounded-2xl shadow-sm border border-slate-50 flex flex-col items-center justify-center p-2 active:scale-90 transition">
-                        <div class="text-2xl mb-1">🧺</div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center uppercase">Kho hàng</span>
-                    </div>
-                    <div onclick="openImport()" class="bg-white aspect-square rounded-2xl shadow-sm border border-slate-50 flex flex-col items-center justify-center p-2 active:scale-90 transition">
-                        <div class="text-2xl mb-1 text-orange-500">📥</div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center uppercase">Nhập hàng</span>
-                    </div>
-                    <div class="bg-white aspect-square rounded-2xl shadow-sm border border-slate-50 flex flex-col items-center justify-center p-2 opacity-40">
-                        <div class="text-2xl mb-1 text-blue-400">👤</div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center uppercase">Khách</span>
-                    </div>
-                    <div class="bg-white aspect-square rounded-2xl shadow-sm border border-slate-50 flex flex-col items-center justify-center p-2 opacity-40">
-                        <div class="text-2xl mb-1 text-red-400">📈</div>
-                        <span class="text-[10px] font-bold text-slate-600 text-center uppercase">Báo cáo</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div id="kho" class="hidden">
+<div class="card">
+<input id="fabricName" placeholder="Tên vải">
+<div id="importList"></div>
+<button onclick="addRow()">+ Dòng</button>
+<button onclick="saveImport()">Lưu</button>
+</div>
+<div class="card" id="stockList"></div>
+</div>
 
-        <div id="page-stock" class="page-content hidden min-h-screen bg-white">
-            <header class="p-4 flex items-center border-b sticky top-0 bg-white z-10">
-                <button onclick="showPage('home')" class="mr-4 text-2xl leading-none">←</button>
-                <h2 class="text-lg font-bold">Danh sách vải trong kho</h2>
-            </header>
-            <div id="list-stock" class="p-4 space-y-3"></div>
-        </div>
+<div id="customer" class="hidden">
+<div class="card">
+<input id="cname" placeholder="Tên khách">
+<button onclick="addCustomer()">Thêm</button>
+</div>
+<div class="card" id="customerList"></div>
+</div>
 
-        <div id="page-pos" class="page-content hidden min-h-screen bg-white">
-            <header class="p-4 flex items-center border-b sticky top-0 bg-white z-10">
-                <button onclick="showPage('home')" class="mr-4 text-2xl leading-none">←</button>
-                <h2 class="text-lg font-bold">Chọn vải cắt cho khách</h2>
-            </header>
-            <div id="list-pos" class="p-4 space-y-4"></div>
-        </div>
+<div id="sell" class="hidden">
+<div class="card">
+<select id="sellSKU"></select>
+<select id="sellCustomer"></select>
+<input id="sellQty" type="number" step="0.01" placeholder="Số mét">
+<label><input type="checkbox" id="isDebt"> Ghi nợ</label>
+<button onclick="sell()">Bán & In hoá đơn</button>
+</div>
+</div>
 
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t flex justify-around items-end pb-6 pt-3 z-50 shadow-lg">
-            <div onclick="showPage('home')" class="nav-item flex flex-col items-center cursor-pointer active-tab" id="nav-home">
-                <span class="text-2xl">🏠</span><span class="text-[10px] font-bold uppercase">Trang chủ</span>
-            </div>
-            <div class="flex flex-col items-center text-slate-300">
-                <span class="text-2xl">📋</span><span class="text-[10px] font-bold uppercase">Đơn hàng</span>
-            </div>
-            <div onclick="showPage('pos')" class="relative -top-4 active:scale-90 transition">
-                <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                    <span class="text-white text-3xl">🛒</span>
-                </div>
-            </div>
-            <div onclick="showPage('stock')" class="nav-item flex flex-col items-center text-slate-300 cursor-pointer" id="nav-stock">
-                <span class="text-2xl">🧺</span><span class="text-[10px] font-bold uppercase">Kho vải</span>
-            </div>
-            <div class="flex flex-col items-center text-slate-300">
-                <span class="text-2xl">⚙️</span><span class="text-[10px] font-bold uppercase">Cài đặt</span>
-            </div>
-        </nav>
+<div id="report" class="hidden">
+<div class="card" id="reportBox"></div>
+</div>
 
-        <div id="modal-import" class="modal-bg fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
-            <div class="bg-white w-full rounded-3xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div class="p-5 bg-blue-600 text-white flex justify-between items-center">
-                    <h3 class="font-bold">Nhập Lô Vải Mới</h3>
-                    <button onclick="closeImport()" class="text-2xl leading-none">&times;</button>
-                </div>
-                <div class="p-5 flex-1 overflow-y-auto space-y-4">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase">Tên Loại Vải</label>
-                        <input id="in-fabric-name" type="text" placeholder="Ví dụ: Linen Bột" class="w-full border-b-2 border-slate-100 py-2 focus:border-blue-600 outline-none font-bold text-lg">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase">Giá bán / Mét (vnđ)</label>
-                        <input id="in-fabric-price" type="number" placeholder="100000" class="w-full border-b-2 border-slate-100 py-2 focus:border-blue-600 outline-none">
-                    </div>
-                    <div id="in-variant-container" class="space-y-4 pt-4 border-t border-slate-50">
-                        <div class="variant-row bg-slate-50 p-3 rounded-xl flex gap-3 items-end">
-                            <div class="flex-1">
-                                <label class="text-[9px] font-bold text-slate-400 uppercase">Màu/Mã hàng</label>
-                                <input type="text" class="v-color w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm" placeholder="Màu đỏ">
-                            </div>
-                            <div class="w-24">
-                                <label class="text-[9px] font-bold text-slate-400 uppercase">Số mét (m)</label>
-                                <input type="number" step="0.1" class="v-meters w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm font-bold" placeholder="0.0">
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="addVariantField()" class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-blue-600 text-xs font-bold">+ Thêm màu/mã hàng khác</button>
-                </div>
-                <div class="p-5 bg-slate-50 border-t">
-                    <button onclick="saveImport()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-sm uppercase shadow-lg active:scale-95 transition">Xác Nhận Vào Kho</button>
-                </div>
-            </div>
-        </div>
+<div class="bottom">
+<div onclick="show('home')">🏠</div>
+<div onclick="show('kho')">📦</div>
+<div class="center" onclick="show('sell')">🛒</div>
+<div onclick="show('customer')">👤</div>
+<div onclick="show('report')">📊</div>
+</div>
 
-    </div>
+<script>
+let skus=JSON.parse(localStorage.getItem("skus")||"[]");
+let customers=JSON.parse(localStorage.getItem("customers")||"[]");
+let invoices=JSON.parse(localStorage.getItem("invoices")||"[]");
 
-    <script>
-        // --- CƠ SỞ DỮ LIỆU (Local Storage) ---
-        let data = JSON.parse(localStorage.getItem('vai_store_v3')) || {
-            products: [], // {id, name, color, stock, price}
-            revenue: 0,
-            meters: 0
-        };
+function save(){
+localStorage.setItem("skus",JSON.stringify(skus));
+localStorage.setItem("customers",JSON.stringify(customers));
+localStorage.setItem("invoices",JSON.stringify(invoices));
+}
+setInterval(save,2000);
 
-        const sync = () => {
-            localStorage.setItem('vai_store_v3', JSON.stringify(data));
-            render();
-        };
+function show(id){
+["home","kho","sell","customer","report"].forEach(x=>{
+document.getElementById(x).classList.add("hidden");
+});
+document.getElementById(id).classList.remove("hidden");
+}
 
-        // --- ĐIỀU HƯỚNG ---
-        function showPage(page) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById('page-' + page).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.replace('active-tab', 'text-slate-300'));
-            const activeNav = document.getElementById('nav-' + page);
-            if(activeNav) activeNav.classList.replace('text-slate-300', 'active-tab');
-            window.scrollTo(0,0);
-        }
+function addRow(){
+let d=document.createElement("div");
+d.innerHTML=`
+<input placeholder="Mã">
+<input placeholder="Màu">
+<input type="number" step="0.01" placeholder="Giá nhập">
+<input type="number" step="0.01" placeholder="Giá bán">
+<input type="number" step="0.01" placeholder="Số mét">`;
+importList.appendChild(d);
+}
 
-        // --- NHẬP HÀNG ---
-        const openImport = () => document.getElementById('modal-import').classList.remove('hidden');
-        const closeImport = () => document.getElementById('modal-import').classList.add('hidden');
+function saveImport(){
+let name=fabricName.value;
+let rows=importList.children;
 
-        function addVariantField() {
-            const container = document.getElementById('in-variant-container');
-            const div = document.createElement('div');
-            div.className = "variant-row bg-slate-50 p-3 rounded-xl flex gap-3 items-end animate-fade-in";
-            div.innerHTML = `
-                <div class="flex-1">
-                    <input type="text" class="v-color w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm" placeholder="Màu mới">
-                </div>
-                <div class="w-24">
-                    <input type="number" step="0.1" class="v-meters w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm font-bold" placeholder="0.0">
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-red-400 font-bold mb-1 ml-1">&times;</button>
-            `;
-            container.appendChild(div);
-        }
+for(let r of rows){
+let i=r.querySelectorAll("input");
+let code=i[0].value;
+let color=i[1].value;
+let ip=+i[2].value||0;
+let p=+i[3].value||0;
+let q=+i[4].value||0;
 
-        function saveImport() {
-            const name = document.getElementById('in-fabric-name').value.trim();
-            const price = parseFloat(document.getElementById('in-fabric-price').value);
-            const rows = document.querySelectorAll('.variant-row');
+if(!code) continue;
 
-            if(!name || isNaN(price)) return alert("Vui lòng nhập tên vải và giá bán!");
+let ex=skus.find(s=>s.code==code);
+if(ex){ex.stock+=q;}
+else{skus.push({name,code,color,importPrice:ip,price:p,stock:q});}
+}
 
-            rows.forEach(row => {
-                const color = row.querySelector('.v-color').value.trim();
-                const qty = parseFloat(row.querySelector('.v-meters').value);
+importList.innerHTML="";
+addRow();
+fabricName.value="";
+save();render();
+}
 
-                if(color && qty > 0) {
-                    // Nếu trùng tên vải và màu thì cộng dồn mét
-                    let item = data.products.find(p => p.name === name && p.color === color);
-                    if(item) {
-                        item.stock = Number((item.stock + qty).toFixed(2));
-                        item.price = price; // Cập nhật lại giá nếu có thay đổi
-                    } else {
-                        data.products.push({ id: Date.now() + Math.random(), name, color, stock: qty, price });
-                    }
-                }
-            });
+function addCustomer(){
+if(!cname.value) return;
+customers.push({name:cname.value,debt:0});
+cname.value="";
+save();render();
+}
 
-            sync();
-            closeImport();
-            // Reset modal
-            document.getElementById('in-fabric-name').value = '';
-            document.getElementById('in-fabric-price').value = '';
-            document.getElementById('in-variant-container').innerHTML = `
-                <div class="variant-row bg-slate-50 p-3 rounded-xl flex gap-3 items-end">
-                    <div class="flex-1"><label class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Màu/Mã hàng</label><input type="text" class="v-color w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm" placeholder="Màu đỏ"></div>
-                    <div class="w-24"><label class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Số mét (m)</label><input type="number" step="0.1" class="v-meters w-full bg-transparent border-b border-slate-300 py-1 outline-none text-sm font-bold" placeholder="0.0"></div>
-                </div>`;
-            alert("Đã nhập kho vải thành công!");
-        }
+function sell(){
+let s=skus[sellSKU.value];
+let c=customers[sellCustomer.value];
+let q=+sellQty.value;
 
-        // --- BÁN HÀNG ---
-        function sell(id) {
-            const p = data.products.find(x => x.id === id);
-            let qtyStr = prompt(`Cắt vải ${p.name} - Màu ${p.color}\nTrong kho còn: ${p.stock}m\nNhập số mét cần cắt:`, "1.0");
-            let qty = parseFloat(qtyStr);
+if(!s||!c||!q) return alert("Thiếu dữ liệu");
+if(s.stock<q) return alert("Không đủ");
 
-            if(isNaN(qty) || qty <= 0) return;
+s.stock-=q;
 
-            if(qty > p.stock) {
-                alert("Kho không đủ vải!");
-            } else {
-                p.stock = Number((p.stock - qty).toFixed(2));
-                const total = qty * p.price;
-                data.revenue += total;
-                data.meters += qty;
-                sync();
-                alert(`Đã bán ${qty}m. Tổng tiền: ${Math.round(total).toLocaleString()}đ`);
-            }
-        }
+let total=q*s.price;
+let profit=q*(s.price-s.importPrice);
 
-        // --- RENDER GIAO DIỆN ---
-        function render() {
-            document.getElementById('stat-revenue').innerText = Math.round(data.revenue).toLocaleString() + 'đ';
-            document.getElementById('stat-meters').innerText = data.meters.toFixed(1) + 'm';
+if(isDebt.checked) c.debt+=total;
 
-            const stockList = document.getElementById('list-stock');
-            stockList.innerHTML = data.products.length ? data.products.sort((a,b) => b.id - a.id).map(p => `
-                <div class="p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                    <div>
-                        <p class="font-black text-slate-800">${p.name}</p>
-                        <p class="text-sm text-blue-600 font-bold">Màu: ${p.color}</p>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mt-1">Tồn: ${p.stock}m | ${p.price.toLocaleString()}đ/m</p>
-                    </div>
-                    <button onclick="deleteProduct(${p.id})" class="text-slate-200 p-2">&times;</button>
-                </div>
-            `).join('') : '<p class="text-center text-slate-400 text-sm mt-20">Kho chưa có vải. Hãy chọn Nhập hàng!</p>';
+let bill={
+time:new Date(),
+customer:c.name,
+item:s.name+"-"+s.color,
+qty:q,
+total,
+profit
+};
 
-            const posList = document.getElementById('list-pos');
-            posList.innerHTML = data.products.map(p => `
-                <div class="bg-white p-4 rounded-3xl border-2 border-slate-50 shadow-sm flex justify-between items-center">
-                    <div>
-                        <p class="font-bold text-slate-800 leading-tight">${p.name}</p>
-                        <p class="text-xs text-blue-600 font-bold">Màu: ${p.color}</p>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase mt-1">Sẵn có: ${p.stock}m</p>
-                    </div>
-                    <button onclick="sell(${p.id})" class="bg-blue-600 text-white px-5 py-2 rounded-2xl font-black text-xs shadow-md shadow-blue-200 active:scale-90 transition ${p.stock <= 0 ? 'opacity-20 pointer-events-none' : ''}">CẮT VẢI</button>
-                </div>
-            `).join('');
-        }
+invoices.push(bill);
 
-        function deleteProduct(id) { if(confirm("Xóa hẳn mặt hàng này khỏi kho?")) { data.products = data.products.filter(p => p.id !== id); sync(); } }
+printInvoice(bill);
 
-        // Khởi tạo app
-        render();
-    </script>
+sellQty.value="";
+save();render();
+}
+
+function printInvoice(b){
+let w=window.open("");
+w.document.write(`
+<h2>HOÁ ĐƠN</h2>
+Khách: ${b.customer}<br>
+Sản phẩm: ${b.item}<br>
+Số mét: ${b.qty}<br>
+Tổng tiền: ${b.total}<br>
+Thời gian: ${new Date(b.time).toLocaleString()}
+`);
+w.print();
+}
+
+function render(){
+stockList.innerHTML="";
+sellSKU.innerHTML="";
+sellCustomer.innerHTML="";
+customerList.innerHTML="";
+reportBox.innerHTML="";
+
+let today=0,month=0,profit=0;
+let now=new Date();
+
+skus.forEach((s,i)=>{
+stockList.innerHTML+=`<div class="item">${s.name}-${s.color} | ${s.stock.toFixed(2)}m</div>`;
+sellSKU.innerHTML+=`<option value="${i}">${s.name}-${s.color}</option>`;
+});
+
+customers.forEach((c,i)=>{
+sellCustomer.innerHTML+=`<option value="${i}">${c.name}</option>`;
+customerList.innerHTML+=`<div class="item">${c.name} - Nợ:${c.debt}
+<button onclick="pay(${i})">Trả</button></div>`;
+});
+
+invoices.forEach(inv=>{
+let d=new Date(inv.time);
+if(d.toDateString()==now.toDateString()) today+=inv.total;
+if(d.getMonth()==now.getMonth()) month+=inv.total;
+profit+=inv.profit;
+});
+
+today?today:0;
+
+document.getElementById("today").innerText=today;
+document.getElementById("month").innerText=month;
+document.getElementById("profit").innerText=profit;
+
+reportBox.innerHTML=`
+Doanh thu hôm nay: ${today}<br>
+Doanh thu tháng: ${month}<br>
+Tổng lãi: ${profit}<br>
+Số hoá đơn: ${invoices.length}
+`;
+}
+
+function pay(i){
+let m=prompt("Tiền trả");
+if(!m) return;
+customers[i].debt-=+m;
+save();render();
+}
+
+addRow();
+render();
+</script>
+
 </body>
 </html>
