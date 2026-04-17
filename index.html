@@ -6,42 +6,59 @@
 <title>Kho Vải PRO</title>
 
 <style>
-body{font-family:-apple-system;margin:0;background:#f5f6fa}
+body{margin:0;font-family:-apple-system;background:#f4f6fa}
 
 /* HEADER */
-.header{background:white;padding:15px}
-.title{font-size:18px;font-weight:bold}
-.sub{color:#666;font-size:13px}
+.header{background:white;padding:15px;font-weight:bold}
+.sub{font-size:13px;color:#666}
+
+/* DASH */
+.dashboard{display:flex;gap:10px;padding:10px}
+.box{flex:1;background:white;padding:10px;border-radius:10px;text-align:center}
+.big{font-size:18px;font-weight:bold}
 
 /* CARD */
-.card{background:white;margin:10px;padding:15px;border-radius:12px}
+.card{background:white;margin:10px;padding:12px;border-radius:10px}
 
 /* INPUT */
 input,select{
-width:100%;padding:10px;margin-top:5px;
+width:100%;padding:10px;margin-top:6px;
 border-radius:8px;border:1px solid #ddd
 }
 
 /* BUTTON */
 button{
-width:100%;
-padding:10px;margin-top:8px;
-border:none;background:#2f80ed;color:white;
-border-radius:8px
+width:100%;padding:10px;margin-top:8px;
+border:none;background:#2f80ed;color:white;border-radius:8px
 }
+
+/* GRID */
+.grid{
+display:grid;grid-template-columns:1fr 1fr;
+gap:10px;padding:10px;margin-bottom:260px;
+}
+.item{background:white;padding:10px;border-radius:10px}
+
+/* CART */
+.cart{
+position:fixed;bottom:70px;left:0;right:0;
+background:white;padding:10px;border-top:1px solid #ddd;
+max-height:260px;overflow:auto
+}
+.pay{background:#27ae60;color:white;padding:12px;border-radius:10px;margin-top:10px;text-align:center}
+.debt{background:#e67e22;color:white;padding:12px;border-radius:10px;margin-top:10px;text-align:center}
 
 /* TAB */
 .bottom{
 position:fixed;bottom:0;width:100%;
 display:flex;justify-content:space-around;
-background:white;padding:10px 0;
-border-top:1px solid #ddd
+background:white;padding:10px 0;border-top:1px solid #ddd
 }
 .center{
-width:65px;height:65px;background:#2f80ed;
+width:70px;height:70px;background:#2f80ed;
 color:white;border-radius:50%;
 display:flex;align-items:center;justify-content:center;
-margin-top:-30px;font-size:14px
+margin-top:-30px
 }
 
 .hidden{display:none}
@@ -51,202 +68,208 @@ margin-top:-30px;font-size:14px
 <body>
 
 <div class="header">
-<div class="title">👋 Xin chào Thảo</div>
+Xin chào Thảo<br>
 <div class="sub">Kho nội bộ</div>
 </div>
 
 <!-- HOME -->
 <div id="home">
-<div class="card">
-📊 Doanh thu: <b id="rev">0</b><br>
-📦 Đơn hàng: <b id="ord">0</b><br>
-🧾 Hóa đơn: <b id="inv">0</b>
+<div class="dashboard">
+<div class="box">Doanh thu<div class="big" id="rev">0</div></div>
+<div class="box">Đơn<div class="big" id="ord">0</div></div>
+<div class="box">Công nợ<div class="big" id="debt">0</div></div>
 </div>
 </div>
 
 <!-- KHO -->
 <div id="kho" class="hidden">
 <div class="card">
-📦 Nhập hàng<br>
 <input id="code" placeholder="Mã hàng">
 <input id="name" placeholder="Tên vải">
 <input id="color" placeholder="Màu">
-<input id="import" type="number" step="0.01" placeholder="Giá nhập">
+<input id="importPrice" type="number" step="0.01" placeholder="Giá nhập">
 <input id="price" type="number" step="0.01" placeholder="Giá bán">
 <input id="qty" type="number" step="0.01" placeholder="Số mét">
-<button onclick="add()">Thêm sản phẩm</button>
+<button onclick="addProduct()">Thêm sản phẩm</button>
 </div>
 <div id="list"></div>
 </div>
 
-<!-- BÁN -->
+<!-- SELL -->
 <div id="sell" class="hidden">
-<div class="card">
-🛒 Bán hàng<br>
 
-<select id="product" onchange="loadProduct()"></select>
+<input id="search" placeholder="Tìm sản phẩm..." oninput="render()">
 
-<input id="showColor" placeholder="Màu" disabled>
-<input id="showPrice" placeholder="Giá bán" disabled>
+<div class="grid" id="grid"></div>
 
-<input id="met" type="number" step="0.01" placeholder="Số mét">
-<input id="total" placeholder="Thành tiền" disabled>
-
-<button onclick="addCart()">Thêm vào đơn</button>
-<button onclick="checkout()">Thanh toán</button>
-</div>
-
+<div class="cart">
 <div id="cart"></div>
+<b>Tổng: <span id="sum">0</span></b>
+
+<select id="customer"></select>
+
+<div class="pay" onclick="checkout(false)">Thanh toán</div>
+<div class="debt" onclick="checkout(true)">Ghi nợ</div>
 </div>
 
-<!-- KHÁCH -->
-<div id="customer" class="hidden">
+</div>
+
+<!-- CUSTOMER -->
+<div id="cus" class="hidden">
 <div class="card">
-👤 Khách hàng<br>
-<input id="cname" placeholder="Tên">
+<input id="cname" placeholder="Tên khách">
 <input id="phone" placeholder="SĐT">
-<button onclick="addCustomer()">Lưu khách</button>
+<button onclick="addCustomer()">Thêm khách</button>
 </div>
 <div id="clist"></div>
 </div>
 
-<!-- BÁO CÁO -->
-<div id="report" class="hidden">
-<div class="card">
-📊 Báo cáo<br>
-Hôm nay: <b id="today">0</b><br>
-Tháng: <b id="month">0</b>
-</div>
-</div>
-
 <!-- TAB -->
 <div class="bottom">
-<div onclick="tab('home')">Trang chủ</div>
+<div onclick="tab('home')">Trang</div>
 <div onclick="tab('kho')">Kho</div>
 <div class="center" onclick="tab('sell')">Bán</div>
-<div onclick="tab('customer')">Khách</div>
-<div onclick="tab('report')">Báo cáo</div>
+<div onclick="tab('cus')">Khách</div>
+<div>...</div>
 </div>
 
 <script>
 let products=JSON.parse(localStorage.getItem("p")||"[]");
-let bills=JSON.parse(localStorage.getItem("b")||"[]");
 let customers=JSON.parse(localStorage.getItem("c")||"[]");
+let bills=JSON.parse(localStorage.getItem("b")||"[]");
 let cart=[];
 
 function save(){
 localStorage.setItem("p",JSON.stringify(products));
-localStorage.setItem("b",JSON.stringify(bills));
 localStorage.setItem("c",JSON.stringify(customers));
+localStorage.setItem("b",JSON.stringify(bills));
 }
 
-function format(n){return n.toLocaleString("vi-VN");}
-
 function tab(id){
-["home","kho","sell","customer","report"].forEach(x=>{
+["home","kho","sell","cus"].forEach(x=>{
 document.getElementById(x).classList.add("hidden")
 });
 document.getElementById(id).classList.remove("hidden");
 render();
 }
 
-/* KHO */
-function add(){
+function format(n){return n.toLocaleString("vi-VN")}
+
+/* ADD PRODUCT */
+function addProduct(){
 products.push({
 id:Date.now(),
 code:code.value,
 name:name.value,
 color:color.value,
-import:+import.value,
+import:+importPrice.value,
 price:+price.value,
 stock:+qty.value
 });
 save();render();
 }
 
-/* BÁN */
-function loadProduct(){
-let p=products[product.value];
-showColor.value=p.color;
-showPrice.value=format(p.price);
+/* ADD CUSTOMER */
+function addCustomer(){
+customers.push({
+id:Date.now(),
+name:cname.value,
+phone:phone.value,
+debt:0
+});
+save();render();
 }
 
-met.oninput=function(){
-let p=products[product.value];
-total.value=format(p.price * met.value);
-}
+/* ADD CART */
+function addCart(id){
+let q=parseFloat(prompt("Nhập mét"));
+if(!q) return;
 
-function addCart(){
-let p=products[product.value];
-let m=parseFloat(met.value);
+let p=products.find(x=>x.id==id);
 
 cart.push({
+id:p.id,
 name:p.name,
-qty:m,
-total:p.price*m
+color:p.color,
+qty:q,
+price:p.price,
+total:q*p.price
 });
 render();
 }
 
-function checkout(){
-let sum=cart.reduce((a,b)=>a+b.total,0);
-bills.push({time:new Date(),total:sum});
+/* CHECKOUT */
+function checkout(isDebt){
+let total=cart.reduce((a,b)=>a+b.total,0);
+let cusId=customer.value;
+
+cart.forEach(c=>{
+let p=products.find(x=>x.id==c.id);
+p.stock-=c.qty;
+});
+
+if(isDebt && cusId){
+let c=customers.find(x=>x.id==cusId);
+c.debt+=total;
+}
+
+bills.push({time:new Date(),total});
 
 cart=[];
 save();render();
-}
 
-/* KHÁCH */
-function addCustomer(){
-customers.push({name:cname.value,phone:phone.value});
-save();render();
+alert("Tổng: "+format(total));
 }
 
 /* RENDER */
 function render(){
 
-/* PRODUCT SELECT */
-product.innerHTML="";
-products.forEach((p,i)=>{
-product.innerHTML+=`<option value="${i}">${p.name} - ${p.color}</option>`;
+/* GRID */
+let kw=search?.value||"";
+grid.innerHTML="";
+products.filter(p=>p.name.includes(kw)).forEach(p=>{
+grid.innerHTML+=`
+<div class="item" onclick="addCart(${p.id})">
+<b>${p.name}</b><br>
+${p.color}<br>
+${format(p.price)}
+</div>`;
 });
+
+/* CART */
+let html="",t=0;
+cart.forEach(c=>{
+t+=c.total;
+html+=`<div>${c.name} (${c.qty}m) - ${format(c.total)}</div>`;
+});
+cart.innerHTML=html;
+sum.innerText=format(t);
+
+/* CUSTOMER */
+customer.innerHTML='<option value="">Khách lẻ</option>';
+customers.forEach(c=>{
+customer.innerHTML+=`<option value="${c.id}">${c.name}</option>`;
+});
+
+/* CUSTOMER LIST */
+clist.innerHTML="";
+customers.forEach(c=>{
+clist.innerHTML+=`<div class="card">${c.name} - ${c.phone} - Nợ: ${format(c.debt)}</div>`;
+});
+
+/* DASH */
+let rev=0,debtVal=0;
+bills.forEach(b=>rev+=b.total);
+customers.forEach(c=>debtVal+=c.debt);
+
+rev.innerText=format(rev);
+ord.innerText=bills.length;
+debt.innerText=format(debtVal);
 
 /* LIST */
 list.innerHTML="";
 products.forEach(p=>{
 list.innerHTML+=`<div class="card">${p.code} - ${p.name} (${p.color}) - ${p.stock}m</div>`;
-});
-
-/* CUSTOMER */
-clist.innerHTML="";
-customers.forEach(c=>{
-clist.innerHTML+=`<div class="card">${c.name} - ${c.phone}</div>`;
-});
-
-/* DASH */
-let rev=0;
-bills.forEach(b=>rev+=b.total);
-rev.innerText=format(rev);
-ord.innerText=bills.length;
-inv.innerText=bills.length;
-
-/* REPORT */
-let todayVal=0,monthVal=0;
-let now=new Date();
-
-bills.forEach(b=>{
-let d=new Date(b.time);
-if(d.toDateString()==now.toDateString()) todayVal+=b.total;
-if(d.getMonth()==now.getMonth()) monthVal+=b.total;
-});
-
-today.innerText=format(todayVal);
-month.innerText=format(monthVal);
-
-/* CART */
-cart.innerHTML="";
-cart.forEach(c=>{
-cart.innerHTML+=`<div class="card">${c.name} - ${c.qty}m - ${format(c.total)}</div>`;
 });
 }
 
