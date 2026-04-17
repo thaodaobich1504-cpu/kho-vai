@@ -3,49 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kho Vải PRO</title>
+<title>POS Vải</title>
 
 <style>
 body{margin:0;font-family:-apple-system;background:#f2f4f8}
 
 /* HEADER */
 .header{
-padding:15px;
-font-size:18px;
+background:white;
+padding:12px;
 font-weight:bold;
-background:white;
 }
 
-/* CARD */
-.card{
+/* PRODUCT GRID */
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+padding:10px;
+margin-bottom:260px;
+}
+
+.product{
 background:white;
-margin:10px;
 border-radius:12px;
-padding:15px;
+padding:12px;
+text-align:center;
+font-size:14px;
 }
 
-/* DASH */
-.row{
-display:flex;
-justify-content:space-between;
-text-align:center;
+.product b{font-size:15px}
+
+/* INPUT */
+.qty{
+width:100%;
+padding:8px;
+margin-top:6px;
+border-radius:8px;
+border:1px solid #ddd;
 }
-.col{flex:1}
+
+/* BUTTON */
+.btn{
+background:#2f80ed;
+color:white;
+padding:10px;
+border-radius:8px;
+margin-top:6px;
+}
+
+/* CART FIXED */
+.cart{
+position:fixed;
+bottom:70px;
+left:0;
+right:0;
+background:white;
+border-top:1px solid #ddd;
+padding:10px;
+max-height:200px;
+overflow:auto;
+}
+
+/* TOTAL */
+.total{
+font-size:16px;
+font-weight:bold;
+}
+
+/* PAY */
+.pay{
+background:#27ae60;
+color:white;
+padding:14px;
+text-align:center;
+font-size:16px;
+margin-top:8px;
+border-radius:10px;
+}
 
 /* TAB */
 .bottom{
 position:fixed;
 bottom:0;
 width:100%;
-background:white;
 display:flex;
 justify-content:space-around;
+background:white;
 padding:10px 0;
 border-top:1px solid #ddd;
 }
 
 .center{
-width:65px;height:65px;
+width:60px;height:60px;
 background:#2f80ed;
 color:white;
 border-radius:50%;
@@ -53,45 +103,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 margin-top:-25px;
-font-weight:bold;
-}
-
-/* INPUT */
-input,select{
-width:100%;
-padding:10px;
-margin-top:8px;
-border-radius:8px;
-border:1px solid #ddd;
-}
-
-.btn{
-background:#2f80ed;
-color:white;
-padding:12px;
-text-align:center;
-border-radius:10px;
-margin-top:10px;
-}
-
-/* LIST */
-.item{
-padding:10px 0;
-border-bottom:1px solid #eee;
-display:flex;
-justify-content:space-between;
-}
-
-/* CART */
-.cart{
-position:fixed;
-bottom:80px;
-left:0;
-right:0;
-background:white;
-max-height:250px;
-overflow:auto;
-border-top:1px solid #ddd;
+font-size:14px;
 }
 
 .hidden{display:none}
@@ -100,220 +112,98 @@ border-top:1px solid #ddd;
 
 <body>
 
-<div class="header">Kho Vải PRO</div>
+<div class="header">Bán hàng</div>
 
-<!-- HOME -->
-<div id="home">
-<div class="card">
-<div class="row">
-<div class="col">
-<div>Doanh thu</div>
-<b id="rev">0</b>
-</div>
-<div class="col">
-<div>Số đơn</div>
-<b id="ord">0</b>
-</div>
-</div>
-</div>
+<!-- SELL SCREEN -->
+<div id="sell">
+
+<div class="grid" id="grid"></div>
+
+<div class="cart">
+<div id="cartList"></div>
+<div class="total">Tổng: <span id="sum">0</span></div>
+<div class="pay" onclick="pay()">Thanh toán</div>
 </div>
 
-<!-- KHO -->
-<div id="kho" class="hidden">
-
-<div class="card">
-<input id="name" placeholder="Tên vải">
-
-<div id="rows"></div>
-
-<div class="btn" onclick="addRow()">+ Thêm mã</div>
-<div class="btn" onclick="saveKho()">Lưu kho</div>
-</div>
-
-<div class="card" id="listKho"></div>
-
-</div>
-
-<!-- BÁN -->
-<div id="ban" class="hidden">
-
-<div class="card">
-<select id="sp"></select>
-<input id="sl" type="number" step="0.01" placeholder="Số mét">
-<div class="btn" onclick="addCart()">Thêm</div>
-</div>
-
-<div class="cart" id="cart"></div>
-
-<div class="card">
-<div>Tổng: <b id="tong">0</b></div>
-<div class="btn" onclick="pay()">Thanh toán</div>
-</div>
-
-</div>
-
-<!-- KHÁCH -->
-<div id="khach" class="hidden">
-
-<div class="card">
-<input id="kname" placeholder="Tên khách">
-<input id="kno" type="number" placeholder="Công nợ">
-<div class="btn" onclick="addCustomer()">Lưu</div>
-</div>
-
-<div class="card" id="listKhach"></div>
-
-</div>
-
-<!-- BÁO CÁO -->
-<div id="report" class="hidden">
-<div class="card" id="rp"></div>
 </div>
 
 <!-- TAB -->
 <div class="bottom">
-<div onclick="tab('home')">Trang chủ</div>
-<div onclick="tab('kho')">Kho</div>
-<div class="center" onclick="tab('ban')">Bán</div>
-<div onclick="tab('khach')">Khách</div>
-<div onclick="tab('report')">Báo cáo</div>
+<div>Trang</div>
+<div>Kho</div>
+<div class="center">Bán</div>
+<div>Báo cáo</div>
 </div>
 
 <script>
 let skus=JSON.parse(localStorage.getItem("skus")||"[]");
-let bills=JSON.parse(localStorage.getItem("bills")||"[]");
-let customers=JSON.parse(localStorage.getItem("cus")||"[]");
 let cart=[];
 
-function save(){
-localStorage.setItem("skus",JSON.stringify(skus));
-localStorage.setItem("bills",JSON.stringify(bills));
-localStorage.setItem("cus",JSON.stringify(customers));
+/* DEMO DATA (nếu chưa có) */
+if(skus.length==0){
+skus=[
+{name:"Cotton",color:"Đỏ",price:50000,stock:100,id:1},
+{name:"Lụa",color:"Xanh",price:70000,stock:50,id:2}
+];
 }
 
-/* TAB */
-function tab(id){
-["home","kho","ban","khach","report"].forEach(x=>{
-document.getElementById(x).classList.add("hidden");
+/* RENDER GRID */
+function render(){
+grid.innerHTML="";
+skus.forEach(s=>{
+grid.innerHTML+=`
+<div class="product">
+<b>${s.name}</b><br>
+${s.color}<br>
+${s.price}đ<br>
+<input class="qty" id="q${s.id}" placeholder="m">
+<div class="btn" onclick="add(${s.id})">Thêm</div>
+</div>`;
 });
-document.getElementById(id).classList.remove("hidden");
+renderCart();
 }
 
-/* ADD ROW */
-function addRow(){
-let d=document.createElement("div");
-d.innerHTML=`
-<input placeholder="Mã">
-<input placeholder="Màu">
-<input type="number" step="0.01" placeholder="Giá bán">
-<input type="number" step="0.01" placeholder="Số mét">
-`;
-rows.appendChild(d);
-}
+/* ADD */
+function add(id){
+let q=parseFloat(document.getElementById("q"+id).value);
+if(!q) return;
 
-/* SAVE KHO */
-function saveKho(){
-let n=name.value;
-
-rows.querySelectorAll("div").forEach(r=>{
-let i=r.querySelectorAll("input");
-
-let code=i[0].value;
-let color=i[1].value;
-let price=parseFloat(i[2].value)||0;
-let qty=parseFloat(i[3].value)||0;
-
-if(!code) return;
-
-skus.push({name:n,code,color,price,stock:qty});
-});
-
-rows.innerHTML="";
-name.value="";
-addRow();
-save();render();
-}
-
-/* CART */
-function addCart(){
-let s=skus[sp.value];
-let q=parseFloat(sl.value)||0;
-if(!s||!q) return;
+let s=skus.find(x=>x.id==id);
 
 cart.push({
+id:s.id,
 name:s.name+"-"+s.color,
 qty:q,
-price:s.price,
 total:q*s.price
 });
 
 renderCart();
 }
 
-/* RENDER CART */
+/* CART */
 function renderCart(){
 let html="",t=0;
-cart.forEach(c=>{
+
+cart.forEach((c,i)=>{
 t+=c.total;
-html+=`<div class="item">${c.name} x ${c.qty} = ${c.total}</div>`;
+html+=`
+<div style="display:flex;justify-content:space-between">
+<div>${c.name} (${c.qty}m)</div>
+<div>${c.total}</div>
+</div>`;
 });
-cart.innerHTML=html;
-tong.innerText=t;
+
+cartList.innerHTML=html;
+sum.innerText=t;
 }
 
 /* PAY */
 function pay(){
-let total=cart.reduce((a,b)=>a+b.total,0);
-bills.push({time:new Date(),total});
-
+alert("Thanh toán: "+sum.innerText);
 cart=[];
 renderCart();
-save();render();
-
-alert("Đã thanh toán "+total);
 }
 
-/* CUSTOMER */
-function addCustomer(){
-customers.push({
-name:kname.value,
-debt:parseFloat(kno.value)||0
-});
-save();render();
-}
-
-/* RENDER */
-function render(){
-listKho.innerHTML="";
-sp.innerHTML="";
-
-skus.forEach((s,i)=>{
-listKho.innerHTML+=`
-<div class="item">
-${s.name}-${s.color} (${s.stock}m)
-</div>`;
-sp.innerHTML+=`<option value="${i}">${s.name}-${s.color}</option>`;
-});
-
-listKhach.innerHTML="";
-customers.forEach(c=>{
-listKhach.innerHTML+=`
-<div class="item">${c.name} - Nợ: ${c.debt}</div>`;
-});
-
-let revenue=0;
-bills.forEach(b=>revenue+=b.total);
-
-rev.innerText=revenue;
-ord.innerText=bills.length;
-
-rp.innerHTML=`
-Doanh thu: ${revenue}<br>
-Số đơn: ${bills.length}
-`;
-}
-
-addRow();
 render();
 </script>
 
