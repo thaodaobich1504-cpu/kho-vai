@@ -1,301 +1,332 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hệ thống quản lý nội bộ PRO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hệ thống quản lý nội bộ PRO - v9</title>
 
-<style>
-body{margin:0;font-family:Arial;background:#f5f6f8}
-.header{background:#0f172a;color:#fff;padding:14px;text-align:center;font-size:18px}
-.container{padding:10px}
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f5f6f8; padding-bottom: 80px; }
+        .header { background: #0f172a; color: #fff; padding: 16px; text-align: center; font-size: 18px; font-weight: bold; sticky: top; z-index: 100; }
+        .container { padding: 10px; }
+        .card { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+        h3 { margin-top: 0; font-size: 16px; color: #1e293b; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        
+        input, select, button {
+            width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box;
+            border-radius: 8px; border: 1px solid #ddd; font-size: 14px;
+        }
 
-.card{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+        button { background: #2563eb; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+        button.red { background: #dc2626; }
+        button.green { background: #16a34a; }
 
-input,select,button{
-width:100%;padding:10px;margin-top:6px;margin-bottom:10px;
-border-radius:8px;border:1px solid #ddd
-}
+        .tabbar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            display: flex; background: #fff; border-top: 1px solid #ddd; z-index: 1000;
+        }
+        .tabbar button { 
+            flex: 1; font-size: 10px; background: none; color: #64748b; 
+            border: none; padding: 10px 0; margin: 0; border-radius: 0;
+        }
+        .tabbar button.active { color: #2563eb; font-weight: bold; }
 
-button{background:#2563eb;color:#fff;border:none}
-button.red{background:#dc2626}
-button.green{background:#16a34a}
+        .tab { display: none; }
+        .tab.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.tabbar{
-position:fixed;bottom:0;left:0;right:0;
-display:flex;background:#fff;border-top:1px solid #ddd
-}
-.tabbar button{flex:1;font-size:11px;background:none;color:#333}
-
-.tab{display:none}
-.tab.active{display:block}
-
-.item{padding:8px 0;border-bottom:1px solid #eee}
-.small{font-size:12px;color:#666}
-hr{border:none;border-top:1px solid #eee}
-</style>
+        .item { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item:last-child { border-bottom: none; }
+        .small { font-size: 12px; color: #64748b; }
+        .price { color: #2563eb; font-weight: bold; }
+    </style>
 </head>
 
 <body>
 
-<div class="header">Hệ thống quản lý nội bộ PRO</div>
+<div class="header">QUẢN LÝ NỘI BỘ PRO</div>
 
 <div class="container">
 
-<!-- HOME -->
-<div id="home" class="tab active">
-<div class="card">
-<h3>Báo cáo tổng quan</h3>
-<div id="report"></div>
-</div>
-</div>
+    <div id="home" class="tab active">
+        <div class="card">
+            <h3>Báo cáo tổng quan</h3>
+            <div id="report"></div>
+        </div>
+    </div>
 
-<!-- KHO -->
-<div id="kho" class="tab">
-<div class="card">
-<h3>Nhập hàng</h3>
-<input id="ten" placeholder="Tên vải">
-<input id="ma" placeholder="Mã SKU">
-<input id="met" type="number" step="0.01" placeholder="Số mét">
-<input id="giaNhap" type="number" step="0.01" placeholder="Giá nhập/m">
-<input id="giaBan" type="number" step="0.01" placeholder="Giá bán/m">
-<button onclick="addStock()">Thêm kho</button>
-</div>
+    <div id="kho" class="tab">
+        <div class="card">
+            <h3>Nhập hàng vào kho</h3>
+            <input id="ten" placeholder="Tên vải (Ví dụ: Lụa Pháp)">
+            <input id="ma" placeholder="Mã SKU (Ví dụ: LP01)">
+            <input id="met" type="number" step="0.01" placeholder="Số mét nhập">
+            <input id="giaNhap" type="number" step="0.01" placeholder="Giá nhập/m">
+            <input id="giaBan" type="number" step="0.01" placeholder="Giá bán/m">
+            <button onclick="addStock()">Thêm vào kho</button>
+        </div>
 
-<div class="card">
-<h3>Kho hàng</h3>
-<div id="stockList"></div>
-</div>
-</div>
+        <div class="card">
+            <h3>Danh sách kho hàng</h3>
+            <div id="stockList"></div>
+        </div>
+    </div>
 
-<!-- BÁN -->
-<div id="ban" class="tab">
-<div class="card">
-<h3>Bán hàng</h3>
-<select id="sellSelect"></select>
-<input id="sellMet" type="number" step="0.01" placeholder="Số mét bán">
-<button onclick="sell()">Xác nhận bán</button>
-</div>
+    <div id="ban" class="tab">
+        <div class="card">
+            <h3>Bán hàng nhanh</h3>
+            <select id="sellSelect"></select>
+            <input id="sellMet" type="number" step="0.01" placeholder="Số mét bán">
+            <button onclick="sell()" class="green">Xác nhận bán & Trừ kho</button>
+        </div>
 
-<div class="card">
-<h3>Giao dịch</h3>
-<div id="saleList"></div>
-</div>
-</div>
+        <div class="card">
+            <h3>Lịch sử giao dịch</h3>
+            <div id="saleList"></div>
+        </div>
+    </div>
 
-<!-- CÔNG NỢ -->
-<div id="no" class="tab">
-<div class="card">
-<h3>Công nợ khách hàng</h3>
-<input id="cusName" placeholder="Tên khách hàng">
-<input id="debtMoney" type="number" step="0.01" placeholder="Số tiền nợ">
-<button onclick="addDebt()">Ghi nợ</button>
-</div>
+    <div id="no" class="tab">
+        <div class="card">
+            <h3>Ghi nợ khách hàng</h3>
+            <input id="cusName" placeholder="Tên khách hàng">
+            <input id="debtMoney" type="number" placeholder="Số tiền nợ">
+            <button onclick="addDebt()">Lưu công nợ</button>
+        </div>
 
-<div class="card">
-<h3>Danh sách công nợ</h3>
-<div id="debtList"></div>
-</div>
-</div>
+        <div class="card">
+            <h3>Danh sách nợ</h3>
+            <div id="debtList"></div>
+        </div>
+    </div>
 
-<!-- HOÁ ĐƠN -->
-<div id="bill" class="tab">
-<div class="card">
-<h3>In hoá đơn</h3>
-<select id="billSelect"></select>
-<input id="billMet" type="number" step="0.01" placeholder="Số mét">
-<button onclick="printBill()">In hoá đơn</button>
-</div>
-</div>
+    <div id="bill" class="tab">
+        <div class="card">
+            <h3>Tạo hoá đơn nhanh</h3>
+            <select id="billSelect"></select>
+            <input id="billMet" type="number" step="0.01" placeholder="Số mét mua">
+            <button onclick="printBill()">Xem & In hoá đơn</button>
+        </div>
+    </div>
 
-<!-- SETTING -->
-<div id="set" class="tab">
-<div class="card">
-<h3>Backup</h3>
-<button class="green" onclick="backup()">Xuất dữ liệu</button>
-<input type="file" onchange="restore(event)">
-</div>
-<div class="card">
-<button class="red" onclick="resetAll()">Reset</button>
-</div>
-</div>
+    <div id="set" class="tab">
+        <div class="card">
+            <h3>Dữ liệu hệ thống</h3>
+            <button class="green" onclick="backup()">Xuất file Backup (Excel/JSON)</button>
+            <p class="small">Phục hồi dữ liệu từ file:</p>
+            <input type="file" onchange="restore(event)">
+        </div>
+        <div class="card">
+            <button class="red" onclick="resetAll()">Xoá tất cả dữ liệu (Reset)</button>
+        </div>
+    </div>
 
 </div>
 
-<!-- TAB -->
 <div class="tabbar">
-<button onclick="tab('home')">Home</button>
-<button onclick="tab('kho')">Kho</button>
-<button onclick="tab('ban')">Bán</button>
-<button onclick="tab('no')">Công nợ</button>
-<button onclick="tab('bill')">Hoá đơn</button>
-<button onclick="tab('set')">Cài đặt</button>
+    <button onclick="tab('home', this)" class="active">Home</button>
+    <button onclick="tab('kho', this)">Kho</button>
+    <button onclick="tab('ban', this)">Bán</button>
+    <button onclick="tab('no', this)">Nợ</button>
+    <button onclick="tab('bill', this)">In</button>
+    <button onclick="tab('set', this)">Cài đặt</button>
 </div>
 
 <script>
+    let db = {
+        stock: [],
+        sales: [],
+        debt: []
+    };
 
-let db = {
-stock: [],
-sales: [],
-debt: []
-};
+    function safeNum(v) { return isNaN(parseFloat(v)) ? 0 : parseFloat(v) }
 
-function safeNum(v){return isNaN(parseFloat(v))?0:parseFloat(v)}
+    function save() {
+        localStorage.setItem("PRO_APP_V9", JSON.stringify(db));
+        render();
+    }
 
-function save(){
-localStorage.setItem("PRO_APP", JSON.stringify(db))
-render()
-}
+    function load() {
+        let d = localStorage.getItem("PRO_APP_V9");
+        if (d) {
+            db = JSON.parse(d);
+        }
+    }
 
-function load(){
-let d = localStorage.getItem("PRO_APP")
-if(d) db = JSON.parse(d)
-}
-load()
+    // -------- KHO ----------
+    function addStock() {
+        let ten = document.getElementById("ten").value;
+        let ma = document.getElementById("ma").value;
+        let met = safeNum(document.getElementById("met").value);
+        let giaNhap = safeNum(document.getElementById("giaNhap").value);
+        let giaBan = safeNum(document.getElementById("giaBan").value);
 
-// -------- KHO ----------
-function addStock(){
-let ten = document.getElementById("ten").value
-let ma = document.getElementById("ma").value
-let met = safeNum(document.getElementById("met").value)
-let giaNhap = safeNum(document.getElementById("giaNhap").value)
-let giaBan = safeNum(document.getElementById("giaBan").value)
+        if (!ma || !ten || met <= 0) return alert("Vui lòng nhập đủ Tên, Mã và Số mét");
 
-if(!ma || !ten) return alert("Thiếu dữ liệu")
+        let ex = db.stock.find(x => x.ma === ma);
+        if (ex) {
+            ex.met += met;
+            ex.giaBan = giaBan;
+            ex.giaNhap = giaNhap;
+        } else {
+            db.stock.push({ ten, ma, met, giaNhap, giaBan });
+        }
+        
+        // Xoá form
+        document.getElementById("ten").value = "";
+        document.getElementById("ma").value = "";
+        document.getElementById("met").value = "";
+        
+        save();
+        alert("Đã cập nhật kho!");
+    }
 
-let ex = db.stock.find(x=>x.ma===ma)
-if(ex){
-ex.met += met
-ex.giaBan = giaBan
-ex.giaNhap = giaNhap
-}else{
-db.stock.push({ten,ma,met,giaNhap,giaBan})
-}
-save()
-}
+    // -------- BÁN ----------
+    function sell() {
+        let ma = document.getElementById("sellSelect").value;
+        let met = safeNum(document.getElementById("sellMet").value);
 
-// -------- BÁN ----------
-function sell(){
-let ma = document.getElementById("sellSelect").value
-let met = safeNum(document.getElementById("sellMet").value)
+        if (!ma) return alert("Chưa chọn sản phẩm");
+        if (met <= 0) return alert("Số mét bán phải lớn hơn 0");
 
-let p = db.stock.find(x=>x.ma===ma)
-if(!p) return alert("Không tồn tại")
+        let p = db.stock.find(x => x.ma === ma);
+        if (!p) return alert("Không tìm thấy mã này");
+        if (p.met < met) return alert("Kho không đủ hàng (Hiện còn: " + p.met + "m)");
 
-if(p.met < met) return alert("Không đủ kho")
+        p.met -= met;
+        db.sales.unshift({
+            ten: p.ten,
+            ma,
+            met,
+            total: met * p.giaBan,
+            time: new Date().toLocaleString('vi-VN')
+        });
 
-p.met -= met
+        document.getElementById("sellMet").value = "";
+        save();
+        alert("Đã bán thành công!");
+    }
 
-db.sales.push({
-ma,
-met,
-total: met * p.giaBan,
-time: new Date().toLocaleString()
-})
+    // -------- CÔNG NỢ ----------
+    function addDebt() {
+        let name = document.getElementById("cusName").value;
+        let money = safeNum(document.getElementById("debtMoney").value);
 
-save()
-}
+        if (!name || money <= 0) return alert("Nhập tên khách và số tiền nợ");
 
-// -------- CÔNG NỢ ----------
-function addDebt(){
-db.debt.push({
-name: cusName.value,
-money: safeNum(debtMoney.value),
-paid:0
-})
-save()
-}
+        db.debt.unshift({ name, money, time: new Date().toLocaleDateString('vi-VN') });
+        
+        document.getElementById("cusName").value = "";
+        document.getElementById("debtMoney").value = "";
+        save();
+    }
 
-// -------- IN ----------
-function printBill(){
-let ma = billSelect.value
-let met = safeNum(billMet.value)
-let p = db.stock.find(x=>x.ma===ma)
-if(!p) return
+    // -------- IN HOÁ ĐƠN ----------
+    function printBill() {
+        let ma = document.getElementById("billSelect").value;
+        let met = safeNum(document.getElementById("billMet").value);
+        let p = db.stock.find(x => x.ma === ma);
+        
+        if (!p || met <= 0) return alert("Chọn vải và nhập số mét");
 
-let total = met * p.giaBan
+        let total = met * p.giaBan;
+        let w = window.open("", "_blank");
+        w.document.write(`
+            <html><head><title>In hoá đơn</title><style>body{font-family:Arial;padding:20px;text-align:center; border:1px solid #000;}</style></head>
+            <body>
+                <h2>HOÁ ĐƠN BÁN HÀNG</h2>
+                <hr>
+                <p align="left"><b>Sản phẩm:</b> ${p.ten}</p>
+                <p align="left"><b>Mã hàng:</b> ${p.ma}</p>
+                <p align="left"><b>Số lượng:</b> ${met.toFixed(2)} mét</p>
+                <p align="left"><b>Đơn giá:</b> ${p.giaBan.toLocaleString()} đ</p>
+                <hr>
+                <h3 align="right">TỔNG TIỀN: ${total.toLocaleString()} đ</h3>
+                <p class="small">${new Date().toLocaleString()}</p>
+                <script>window.print();<\/script>
+            </body></html>
+        `);
+        w.document.close();
+    }
 
-let w = window.open("")
-w.document.write(`
-<h2>HOÁ ĐƠN BÁN HÀNG</h2>
-<p>SP: ${p.ten}</p>
-<p>Mã: ${p.ma}</p>
-<p>Số mét: ${met}</p>
-<p>Đơn giá: ${p.giaBan}</p>
-<h3>Tổng: ${total.toFixed(2)}</h3>
-`)
-w.print()
-}
+    // -------- BACKUP ----------
+    function backup() {
+        let b = new Blob([JSON.stringify(db)], { type: "application/json" });
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = "backup_kho_vai_" + new Date().getTime() + ".json";
+        a.click();
+    }
 
-// -------- BACKUP ----------
-function backup(){
-let b = new Blob([JSON.stringify(db)],{type:"application/json"})
-let a = document.createElement("a")
-a.href = URL.createObjectURL(b)
-a.download = "backup.json"
-a.click()
-}
+    function restore(e) {
+        let r = new FileReader();
+        r.onload = e => {
+            try {
+                db = JSON.parse(e.target.result);
+                save();
+                alert("Phục hồi dữ liệu thành công!");
+            } catch (err) { alert("File không hợp lệ"); }
+        };
+        r.readAsText(e.target.files[0]);
+    }
 
-function restore(e){
-let r = new FileReader()
-r.onload = e=>{
-db = JSON.parse(e.target.result)
-save()
-}
-r.readAsText(e.target.files[0])
-}
+    function resetAll() {
+        if (confirm("CẢNH BÁO: Hành động này sẽ xoá sạch kho hàng, doanh thu và công nợ. Bạn có chắc chắn không?")) {
+            db = { stock: [], sales: [], debt: [] };
+            save();
+        }
+    }
 
-function resetAll(){
-if(confirm("Xoá hết?")){
-db = {stock:[],sales:[],debt:[]}
-save()
-}
-}
+    // -------- RENDER ----------
+    function render() {
+        // Render Kho
+        document.getElementById("stockList").innerHTML = db.stock.length ? db.stock.map(x =>
+            `<div class="item"><b>${x.ten}</b> <span class="small">(${x.ma})</span><br>
+            <span class="small">Tồn: <b class="price">${x.met.toFixed(2)}m</b> | Bán: ${x.giaBan.toLocaleString()}/m</span></div>`
+        ).join("") : "Chưa có hàng trong kho";
 
-// -------- RENDER ----------
-function render(){
+        // Render Bán hàng
+        document.getElementById("saleList").innerHTML = db.sales.length ? db.sales.map(x =>
+            `<div class="item"><b>${x.ten}</b> - ${x.met}m<br>
+            <span class="small">Tổng: <b class="price">${x.total.toLocaleString()}</b> | ${x.time}</span></div>`
+        ).join("") : "Chưa có giao dịch";
 
-stockList.innerHTML = db.stock.map(x=>
-`<div class="item"><b>${x.ten}</b> (${x.ma})<br>
-<span class="small">${x.met.toFixed(2)}m | ${x.giaBan}/m</span></div>`
-).join("")
+        // Render Nợ
+        document.getElementById("debtList").innerHTML = db.debt.length ? db.debt.map(x =>
+            `<div class="item"><b>${x.name}</b>: <b class="price">${x.money.toLocaleString()}</b> <span class="small">(${x.time})</span></div>`
+        ).join("") : "Không có công nợ";
 
-saleList.innerHTML = db.sales.map(x=>
-`<div class="item">${x.ma} - ${x.met}m<br>
-<span class="small">${x.total.toFixed(2)} | ${x.time}</span></div>`
-).join("")
+        // Render Selects
+        let options = db.stock.map(x => `<option value="${x.ma}">${x.ten} (${x.ma})</option>`).join("");
+        document.getElementById("sellSelect").innerHTML = options || "<option>Chưa có hàng</option>";
+        document.getElementById("billSelect").innerHTML = options || "<option>Chưa có hàng</option>";
 
-debtList.innerHTML = db.debt.map(x=>
-`<div class="item">${x.name} - ${x.money}</div>`
-).join("")
+        // Render Report
+        let totalSale = db.sales.reduce((a, b) => a + b.total, 0);
+        let totalStockValue = db.stock.reduce((a, b) => a + (b.met * b.giaNhap), 0);
+        let totalDebt = db.debt.reduce((a, b) => a + b.money, 0);
 
-sellSelect.innerHTML = db.stock.map(x=>
-`<option value="${x.ma}">${x.ten}</option>`
-).join("")
+        document.getElementById("report").innerHTML = `
+            <p>Tổng mét vải tồn: <b>${db.stock.reduce((a, b) => a + b.met, 0).toFixed(2)} m</b></p>
+            <p>Giá trị kho (giá nhập): <b>${totalStockValue.toLocaleString()} đ</b></p>
+            <hr>
+            <p>Doanh thu đã bán: <b class="price">${totalSale.toLocaleString()} đ</b></p>
+            <p>Tổng nợ khách hàng: <b style="color:red">${totalDebt.toLocaleString()} đ</b></p>
+        `;
+    }
 
-billSelect.innerHTML = db.stock.map(x=>
-`<option value="${x.ma}">${x.ten}</option>`
-).join("")
+    function tab(id, btn) {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        
+        document.querySelectorAll(".tabbar button").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+    }
 
-let totalSale = db.sales.reduce((a,b)=>a+b.total,0)
-let totalStock = db.stock.reduce((a,b)=>a+b.met,0)
-let totalDebt = db.debt.reduce((a,b)=>a+b.money,0)
-
-report.innerHTML = `
-<p>Tồn kho: <b>${totalStock.toFixed(2)} m</b></p>
-<p>Doanh thu: <b>${totalSale.toFixed(2)}</b></p>
-<p>Công nợ: <b>${totalDebt.toFixed(2)}</b></p>
-`
-}
-
-function tab(id){
-document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"))
-document.getElementById(id).classList.add("active")
-}
-
-load()
-render()
-
+    // Khởi chạy
+    load();
+    render();
 </script>
 
 </body>
