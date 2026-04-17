@@ -3,203 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kho Vải TD - Quản Lý Chuyên Nghiệp</title>
+    <title>Kho Vải TD - Chuyên Nghiệp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none; }
         .active-tab { color: #2563eb; border-bottom: 3px solid #2563eb; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .card { background: white; border-radius: 1.25rem; shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 1.25rem; }
-        .invoice-box { border: 2px dashed #000; padding: 1.5rem; background: #fff; font-family: 'Courier New', monospace; color: #000; }
+        .card { background: white; border-radius: 1.5rem; padding: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .invoice-box { border: 2px dashed #000; padding: 1.5rem; background: #fff; font-family: 'Courier New', monospace; }
         .scroll-custom::-webkit-scrollbar { width: 4px; }
         .scroll-custom::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        input { outline: none; transition: border 0.2s; }
+        input:focus { border-color: #2563eb !important; }
     </style>
 </head>
-<body class="bg-[#F8FAFC] pb-24 text-slate-800">
+<body class="bg-[#F1F5F9] pb-28 text-slate-800">
 
-    <div class="max-w-md mx-auto bg-white border-b sticky top-0 z-50">
+    <div class="max-w-md mx-auto bg-white border-b sticky top-0 z-50 shadow-sm">
         <div class="p-4 flex justify-between items-center">
-            <h1 class="text-xl font-black text-blue-700 tracking-tighter uppercase italic">Kho Vải TD</h1>
-            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">ONLINE</span>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Hệ thống Quản lý</p>
+                <h1 class="text-xl font-black text-blue-700 italic uppercase">Kho Vải TD</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-bold text-slate-500">SẴN SÀNG</span>
+            </div>
         </div>
-        <div class="flex justify-around text-xs font-black">
-            <button onclick="switchTab('pos')" id="btn-pos" class="tab-btn py-3 px-4 active-tab uppercase">Bán Hàng</button>
-            <button onclick="switchTab('stock')" id="btn-stock" class="tab-btn py-3 px-4 text-slate-400 uppercase">Nhập Kho</button>
-            <button onclick="switchTab('report')" id="btn-report" class="tab-btn py-3 px-4 text-slate-400 uppercase">Báo Cáo</button>
+        <div class="flex justify-around text-[11px] font-black uppercase tracking-wider border-t">
+            <button onclick="switchTab('pos')" id="btn-pos" class="tab-btn py-4 flex-1 active-tab">Bán Hàng</button>
+            <button onclick="switchTab('stock')" id="btn-stock" class="tab-btn py-4 flex-1 text-slate-400">Nhập Kho</button>
+            <button onclick="switchTab('report')" id="btn-report" class="tab-btn py-4 flex-1 text-slate-400">Báo Cáo</button>
         </div>
     </div>
 
     <div class="max-w-md mx-auto p-4 space-y-4">
 
         <section id="tab-pos" class="tab-content space-y-4">
-            <div class="card bg-white shadow-xl shadow-slate-200/50 space-y-4">
+            <div class="card space-y-4">
                 <div class="flex justify-between items-center border-b pb-2">
-                    <h3 class="font-bold text-blue-700 uppercase text-sm">🛒 Cắt Vải</h3>
-                    <span id="pos-stock-tag" class="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded"></span>
+                    <h3 class="font-bold text-blue-700 uppercase text-xs">Cắt Vải Cho Khách</h3>
+                    <span id="pos-stock-tag" class="text-[10px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded-lg"></span>
                 </div>
-                
-                <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Loại vải</label>
-                            <select id="sellProduct" onchange="loadVariants()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500 font-bold text-sm"></select>
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Mã / Màu</label>
-                            <select id="sellVariant" onchange="updatePrice()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500 font-bold text-sm"></select>
-                        </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 ml-1">LOẠI VẢI</label>
+                        <select id="sellProduct" onchange="loadVariants()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-sm"></select>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Số mét</label>
-                            <input id="met" type="number" step="0.01" placeholder="0.00" oninput="updatePrice()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 font-bold text-lg text-blue-600">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Thành tiền</label>
-                            <div id="totalShow" class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl p-3 font-black text-blue-700 text-lg">0 VND</div>
-                        </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 ml-1">MÃ / MÀU</label>
+                        <select id="sellVariant" onchange="updatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-bold text-sm"></select>
                     </div>
                 </div>
-                <button onclick="addCart()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition">THÊM VÀO ĐƠN</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 ml-1">SỐ MÉT CẮT</label>
+                        <input id="met" type="number" step="0.01" placeholder="0.00" oninput="updatePrice()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-black text-lg text-blue-600">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 ml-1">THÀNH TIỀN</label>
+                        <div id="totalShow" class="w-full bg-blue-50 border border-blue-100 rounded-xl p-3 font-black text-blue-700 text-lg">0đ</div>
+                    </div>
+                </div>
+                <button onclick="addCart()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition uppercase tracking-widest text-sm">Thêm Vào Giỏ Hàng</button>
             </div>
 
-            <div class="card bg-white border border-slate-100">
-                <h3 class="font-bold border-b pb-2 mb-3 uppercase text-xs text-slate-400">📋 Giỏ hàng hiện tại</h3>
-                <div id="cart" class="space-y-2 mb-4 scroll-custom overflow-y-auto max-h-48"></div>
-                
-                <div class="space-y-3 pt-3 border-t">
+            <div class="card space-y-4">
+                <div id="cart" class="space-y-2 max-h-52 overflow-y-auto scroll-custom"></div>
+                <div class="pt-3 border-t space-y-3">
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="custName" type="text" placeholder="Tên khách" class="border rounded-lg p-2 text-sm bg-slate-50">
-                        <input id="custPhone" type="text" placeholder="SĐT khách" class="border rounded-lg p-2 text-sm bg-slate-50">
+                        <input id="custName" type="text" placeholder="Tên khách hàng" class="border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 font-medium">
+                        <input id="custPhone" type="text" placeholder="Số điện thoại" class="border border-slate-200 rounded-xl p-3 text-sm bg-slate-50 font-medium">
                     </div>
-                    <div class="flex justify-between items-center font-black text-xl px-1">
-                        <span class="text-slate-400 text-xs uppercase">Tổng đơn:</span>
-                        <span id="sum" class="text-red-600 tracking-tight">0 VND</span>
+                    <div class="flex justify-between items-center px-1">
+                        <span class="text-slate-400 font-bold text-[10px] uppercase">Tổng thanh toán:</span>
+                        <span id="sum" class="text-2xl font-black text-red-600">0đ</span>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="checkout(false)" class="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold uppercase text-xs shadow-md shadow-green-100">Thanh toán</button>
-                        <button onclick="checkout(true)" class="flex-1 bg-slate-800 text-white py-4 rounded-xl font-bold uppercase text-xs">Ghi nợ</button>
+                        <button onclick="checkout(false)" class="flex-1 bg-green-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md shadow-green-100">Tiền Mặt</button>
+                        <button onclick="checkout(true)" class="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-black uppercase text-xs">Ghi Nợ</button>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="tab-stock" class="tab-content hidden space-y-4">
-            <div class="card bg-white border border-slate-100 space-y-3">
-                <h3 class="font-bold text-blue-700 uppercase text-xs">1. Đăng ký loại vải mới</h3>
+            <div class="card space-y-4 border-l-4 border-blue-500">
+                <h3 class="font-black text-blue-700 uppercase text-xs tracking-widest">1. Chọn Loại Vải</h3>
                 <div class="flex gap-2">
-                    <input id="name" type="text" placeholder="VD: Lụa, Cotton..." class="flex-1 border-2 border-slate-50 p-3 rounded-xl outline-none focus:border-blue-500 font-medium">
-                    <button onclick="addProduct()" class="bg-blue-700 text-white px-6 rounded-xl font-bold uppercase text-xs">Lưu</button>
+                    <select id="pselect" class="flex-1 border border-slate-200 p-3 rounded-xl bg-slate-50 font-black text-sm outline-none focus:border-blue-500"></select>
+                    <button onclick="promptAddProduct()" class="bg-blue-100 text-blue-700 px-4 rounded-xl font-bold text-xs uppercase">+ Mới</button>
                 </div>
             </div>
 
-            <div class="card bg-white border border-slate-100 space-y-3">
-                <h3 class="font-bold text-blue-700 uppercase text-xs font-black tracking-widest">2. Nhập mã cây vải</h3>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Chọn loại vải</label>
-                    <select id="pselect" class="w-full border-2 border-slate-50 p-3 rounded-xl bg-slate-50 font-bold outline-none focus:border-blue-500"></select>
+            <div class="card space-y-4">
+                <h3 class="font-black text-orange-600 uppercase text-xs tracking-widest">2. Nhập Chi Tiết Mã Hàng</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <input id="code" type="text" placeholder="Mã (VD: L01)" class="border border-slate-200 p-3 rounded-xl text-sm font-bold bg-slate-50">
+                    <input id="color" type="text" placeholder="Màu sắc" class="border border-slate-200 p-3 rounded-xl text-sm font-bold bg-slate-50">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <input id="code" type="text" placeholder="Mã hàng (VD: L01)" class="border-2 border-slate-50 p-3 rounded-xl outline-none text-sm">
-                    <input id="color" type="text" placeholder="Màu sắc" class="border-2 border-slate-50 p-3 rounded-xl outline-none text-sm">
+                    <input id="price" type="number" step="0.01" placeholder="Giá bán / m" class="border border-slate-200 p-3 rounded-xl text-sm font-black bg-slate-50">
+                    <input id="stock" type="number" step="0.01" placeholder="Số mét tồn" class="border border-slate-200 p-3 rounded-xl text-sm font-black bg-slate-50">
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <input id="price" type="number" step="0.01" placeholder="Giá bán / m" class="border-2 border-slate-50 p-3 rounded-xl font-bold outline-none text-sm">
-                    <input id="stock" type="number" step="0.01" placeholder="Số mét tồn" class="border-2 border-slate-50 p-3 rounded-xl font-bold outline-none text-sm">
+                <button onclick="addVariantToTemp()" class="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold uppercase text-[10px] border border-slate-200">+ Thêm mã này vào danh sách</button>
+                
+                <div id="tempVariantList" class="space-y-2 border-t pt-3 hidden">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Danh sách chờ nhập:</p>
+                    <div id="tempListContent" class="space-y-2"></div>
+                    <button onclick="commitVariants()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-orange-100 mt-2 text-xs tracking-widest">XÁC NHẬN NHẬP TẤT CẢ</button>
                 </div>
-                <button onclick="addVariant()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-orange-100 active:scale-95 transition tracking-widest">Nhập vào kho</button>
             </div>
         </section>
 
         <section id="tab-report" class="tab-content hidden space-y-4">
-            <div class="grid grid-cols-2 gap-3 text-center">
-                <div class="card bg-blue-700 text-white p-3">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="card bg-blue-700 text-white">
                     <p class="text-[9px] font-bold opacity-70 uppercase tracking-widest">Doanh thu nay</p>
-                    <p id="today" class="text-lg font-black tracking-tight">0 VND</p>
+                    <p id="today" class="text-xl font-black">0đ</p>
                 </div>
-                <div class="card bg-white border p-3">
+                <div class="card bg-white border border-slate-200">
                     <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tháng này</p>
-                    <p id="month" class="text-lg font-black text-slate-800 tracking-tight">0 VND</p>
+                    <p id="month" class="text-xl font-black text-slate-800">0đ</p>
                 </div>
             </div>
-
-            <div class="card">
-                <h3 class="font-black mb-3 border-b pb-2 uppercase text-[10px] text-blue-700 tracking-widest">Lịch sử đơn hàng hôm nay</h3>
-                <div id="billHistory" class="space-y-2 max-h-64 overflow-y-auto scroll-custom"></div>
+            <div class="card space-y-3">
+                <h3 class="font-black border-b pb-2 uppercase text-[10px] text-blue-700 tracking-widest">Đơn hàng trong ngày</h3>
+                <div id="billHistory" class="space-y-2 max-h-60 overflow-y-auto scroll-custom"></div>
             </div>
-
-            <div class="card">
-                <h3 class="font-black mb-3 border-b pb-2 uppercase text-[10px] text-red-500 tracking-widest">Sổ nợ khách hàng</h3>
-                <div id="customerList" class="space-y-3"></div>
+            <div class="card space-y-3">
+                <h3 class="font-black border-b pb-2 uppercase text-[10px] text-red-500 tracking-widest">Khách hàng còn nợ</h3>
+                <div id="customerList" class="space-y-2"></div>
             </div>
-            
-            <button onclick="clearAllData()" class="w-full py-3 text-slate-300 text-[10px] font-bold uppercase tracking-widest underline">Xóa sạch toàn bộ dữ liệu</button>
+            <div class="flex gap-2">
+                <button onclick="exportData()" class="flex-1 bg-white border border-slate-200 py-3 rounded-xl text-[10px] font-black uppercase text-slate-500">Sao Lưu</button>
+                <button onclick="clearAllData()" class="flex-1 bg-red-50 text-red-400 py-3 rounded-xl text-[10px] font-black uppercase">Xóa Dữ Liệu</button>
+            </div>
         </section>
 
         <div id="modal-invoice" class="fixed inset-0 bg-slate-900/90 z-[60] hidden flex items-center justify-center p-4">
-            <div class="bg-white w-full rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto relative">
-                <button onclick="closeInvoice()" class="absolute top-4 right-4 text-slate-400 text-2xl">×</button>
-                <div id="invoice-content" class="invoice-box shadow-sm"></div>
-                <button onclick="closeInvoice()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black text-sm uppercase shadow-lg shadow-blue-100">Đóng & Quay lại</button>
+            <div class="bg-white w-full rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto relative shadow-2xl">
+                <button onclick="closeInvoice()" class="absolute top-4 right-4 text-slate-300 text-3xl">×</button>
+                <div id="invoice-content" class="invoice-box"></div>
+                <button onclick="closeInvoice()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg">Xác nhận & Đóng</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
-        let products = JSON.parse(localStorage.getItem("td_v8_products") || "[]");
-        let bills = JSON.parse(localStorage.getItem("td_v8_bills") || "[]");
-        let customers = JSON.parse(localStorage.getItem("td_v8_customers") || "[]");
+        let products = JSON.parse(localStorage.getItem("td_v10_products") || "[]");
+        let bills = JSON.parse(localStorage.getItem("td_v10_bills") || "[]");
+        let customers = JSON.parse(localStorage.getItem("td_v10_customers") || "[]");
         let cart = [];
+        let tempVariants = [];
 
         function save() {
-            localStorage.setItem("td_v8_products", JSON.stringify(products));
-            localStorage.setItem("td_v8_bills", JSON.stringify(bills));
-            localStorage.setItem("td_v8_customers", JSON.stringify(customers));
+            localStorage.setItem("td_v10_products", JSON.stringify(products));
+            localStorage.setItem("td_v10_bills", JSON.stringify(bills));
+            localStorage.setItem("td_v10_customers", JSON.stringify(customers));
         }
 
         function f(n) { return (n || 0).toLocaleString("vi-VN"); }
 
-        // --- NAVIGATION ---
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-' + id).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab', 'text-slate-400'));
             document.getElementById('btn-' + id).classList.add('active-tab');
             render();
-            if(id === 'pos') loadVariants(); // Làm mới mã hàng khi chuyển tab
+            if(id === 'pos') loadVariants();
         }
 
-        // --- KHO ---
-        function addProduct() {
-            let nInput = document.getElementById("name");
-            let name = nInput.value.trim();
-            if(!name) return alert("Nhập tên loại vải!");
-            products.push({name, variants: []});
-            nInput.value = "";
-            save(); render();
-            alert("Đã thêm: " + name);
+        // --- NHẬP KHO NÂNG CẤP ---
+        function promptAddProduct() {
+            let name = prompt("Nhập tên loại vải mới (VD: Lụa Pháp, Cotton Nhật):");
+            if(name && name.trim()) {
+                products.push({name: name.trim(), variants: []});
+                save(); render();
+            }
         }
 
-        function addVariant() {
+        function addVariantToTemp() {
             let pIdx = document.getElementById("pselect").value;
             let code = document.getElementById("code").value.trim();
             let color = document.getElementById("color").value.trim();
             let price = parseFloat(document.getElementById("price").value) || 0;
             let stock = parseFloat(document.getElementById("stock").value) || 0;
 
-            if(pIdx === "" || !code) return alert("Vui lòng chọn loại vải và nhập mã!");
+            if(pIdx === "" || !code) return alert("Vui lòng chọn loại vải và nhập mã hàng!");
+
+            tempVariants.push({ code, color, price, stock });
             
-            products[pIdx].variants.push({
-                code, color, 
-                price: Number(price.toFixed(2)), 
-                stock: Number(stock.toFixed(2))
-            });
-            
+            // Xóa sạch input để nhập mã tiếp theo
             ["code", "color", "price", "stock"].forEach(id => document.getElementById(id).value = "");
-            save(); render();
-            alert("Đã nhập mã " + code + " thành công!");
+            document.getElementById("code").focus();
+            
+            renderTempList();
+        }
+
+        function renderTempList() {
+            let container = document.getElementById("tempVariantList");
+            let content = document.getElementById("tempListContent");
+            if(tempVariants.length > 0) {
+                container.classList.remove("hidden");
+                content.innerHTML = tempVariants.map((v, i) => `
+                    <div class="flex justify-between items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                        <div>
+                            <p class="font-black text-xs text-blue-700">${v.code} - ${v.color}</p>
+                            <p class="text-[9px] font-bold text-slate-400">${f(v.price)}đ | Tồn: ${v.stock}m</p>
+                        </div>
+                        <button onclick="tempVariants.splice(${i},1);renderTempList();" class="text-red-400 font-bold px-2 text-lg">×</button>
+                    </div>
+                `).join('');
+            } else {
+                container.classList.add("hidden");
+            }
+        }
+
+        function commitVariants() {
+            let pIdx = document.getElementById("pselect").value;
+            if(pIdx === "" || !tempVariants.length) return;
+
+            tempVariants.forEach(v => {
+                products[pIdx].variants.push({...v});
+            });
+
+            tempVariants = [];
+            save();
+            render();
+            renderTempList();
+            alert("Đã nhập toàn bộ mã hàng thành công!");
         }
 
         // --- BÁN HÀNG ---
@@ -207,11 +240,11 @@
             let pIdx = document.getElementById("sellProduct").value;
             let vSel = document.getElementById("sellVariant");
             vSel.innerHTML = "";
-            if(pIdx !== "" && products[pIdx] && products[pIdx].variants.length) {
+            if(pIdx !== "" && products[pIdx]?.variants.length) {
                 products[pIdx].variants.forEach((v, i) => {
                     vSel.innerHTML += `<option value="${i}">${v.code} - ${v.color} (${v.stock}m)</option>`;
                 });
-            } else { vSel.innerHTML = '<option value="">(Trống mã)</option>'; }
+            } else { vSel.innerHTML = '<option value="">(Trống)</option>'; }
             updatePrice();
         }
 
@@ -219,12 +252,12 @@
             let pIdx = document.getElementById("sellProduct").value;
             let vIdx = document.getElementById("sellVariant").value;
             let met = parseFloat(document.getElementById("met").value) || 0;
-            if(pIdx !== "" && vIdx !== "" && products[pIdx].variants[vIdx]) {
+            if(pIdx !== "" && vIdx !== "" && products[pIdx]?.variants[vIdx]) {
                 let v = products[pIdx].variants[vIdx];
-                document.getElementById("totalShow").innerText = f(v.price * met) + " VND";
-                document.getElementById("pos-stock-tag").innerText = "TỒN: " + v.stock + "M";
+                document.getElementById("totalShow").innerText = f(v.price * met) + "đ";
+                document.getElementById("pos-stock-tag").innerText = "KHO CÒN: " + v.stock + "M";
             } else {
-                document.getElementById("totalShow").innerText = "0 VND";
+                document.getElementById("totalShow").innerText = "0đ";
                 document.getElementById("pos-stock-tag").innerText = "";
             }
         }
@@ -233,36 +266,23 @@
             let pIdx = document.getElementById("sellProduct").value;
             let vIdx = document.getElementById("sellVariant").value;
             let met = parseFloat(document.getElementById("met").value) || 0;
-            
-            if(pIdx==="" || vIdx==="" || met<=0 || isNaN(vIdx)) return alert("Chọn vải và mã hàng trước!");
-            
+            if(pIdx==="" || vIdx==="" || met<=0 || isNaN(vIdx)) return alert("Vui lòng chọn vải và mã!");
             let v = products[pIdx].variants[vIdx];
-            if(!v) return;
-            if(met > v.stock) return alert("Kho không đủ! Hiện còn: " + v.stock + "m");
+            if(met > v.stock) return alert("Không đủ vải trong kho!");
 
-            cart.push({
-                product: products[pIdx].name,
-                code: v.code,
-                color: v.color,
-                qty: Number(met.toFixed(2)),
-                price: v.price,
-                total: v.price * met,
-                pIdx, vIdx
-            });
+            cart.push({ product: products[pIdx].name, code: v.code, color: v.color, qty: met, price: v.price, total: v.price * met, pIdx, vIdx });
             document.getElementById("met").value = "";
             render();
         }
 
         function checkout(isDebt) {
-            if(!cart.length) return alert("Giỏ hàng trống!");
+            if(!cart.length) return;
             let name = document.getElementById("custName").value.trim() || "Khách lẻ";
             let phone = document.getElementById("custPhone").value.trim();
             let total = cart.reduce((a, b) => a + b.total, 0);
 
-            // Trừ tồn kho và đảm bảo làm tròn
             cart.forEach(item => {
-                let v = products[item.pIdx].variants[item.vIdx];
-                v.stock = Number((v.stock - item.qty).toFixed(2));
+                products[item.pIdx].variants[item.vIdx].stock = Number((products[item.pIdx].variants[item.vIdx].stock - item.qty).toFixed(2));
             });
 
             if(isDebt) {
@@ -277,33 +297,32 @@
             cart = []; 
             document.getElementById("custName").value = "";
             document.getElementById("custPhone").value = "";
-            save(); render();
-            loadVariants(); // Cập nhật lại dropdown số lượng tồn sau khi bán
+            save(); render(); loadVariants();
         }
 
         function showInvoice(bill) {
             let dateStr = new Date(bill.time).toLocaleString('vi-VN');
             document.getElementById("invoice-content").innerHTML = `
-                <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:10px;">
-                    <h2 style="margin:0; font-size:16px; font-weight:900;">KHO VẢI TD</h2>
-                    <p style="font-size:9px; margin:0; opacity:0.7">HÓA ĐƠN BÁN LẺ</p>
+                <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:10px;">
+                    <h2 style="margin:0; font-size:18px; font-weight:900;">KHO VẢI TD</h2>
+                    <p style="font-size:10px; margin:0; font-weight:bold;">UY TÍN - CHẤT LƯỢNG</p>
                 </div>
-                <div style="font-size:11px; margin-bottom:10px;">
-                    <p><b>Khách:</b> ${bill.name}</p>
-                    ${bill.phone ? `<p><b>SĐT:</b> ${bill.phone}</p>` : ''}
-                    <p><b>Ngày:</b> ${dateStr}</p>
+                <div style="font-size:11px; margin-bottom:10px; line-height:1.5">
+                    <p><b>Khách hàng:</b> ${bill.name}</p>
+                    ${bill.phone ? `<p><b>Số điện thoại:</b> ${bill.phone}</p>` : ''}
+                    <p><b>Thời gian:</b> ${dateStr}</p>
                 </div>
                 <table style="width:100%; font-size:11px; border-collapse: collapse;">
-                    <tr style="border-bottom:1px solid #000"><th style="text-align:left">Vải</th><th style="text-align:right">Tiền</th></tr>
+                    <tr style="border-bottom:1px solid #000"><th style="text-align:left; padding:5px 0">Tên hàng</th><th style="text-align:right">T.Tiền</th></tr>
                     ${bill.items.map(i => `
                         <tr style="border-bottom:1px dashed #eee">
-                            <td style="padding:4px 0"><b>${i.product}</b> (${i.code})<br><small>${i.qty}m x ${f(i.price)}</small></td>
-                            <td style="text-align:right">${f(i.total)}</td>
+                            <td style="padding:8px 0"><b>${i.product}</b> (${i.code})<br>${i.qty}m x ${f(i.price)}</td>
+                            <td style="text-align:right; font-weight:bold">${f(i.total)}</td>
                         </tr>
                     `).join('')}
                 </table>
-                <div style="text-align:right; font-weight:900; font-size:14px; margin-top:10px;">TỔNG: ${f(bill.total)} VND</div>
-                ${bill.isDebt ? '<p style="text-align:right; color:red; font-size:10px; font-weight:bold;">ĐƠN GHI NỢ</p>' : ''}
+                <div style="text-align:right; font-weight:900; font-size:16px; margin-top:15px; border-top:1px solid #000; padding-top:5px;">TỔNG CỘNG: ${f(bill.total)}đ</div>
+                ${bill.isDebt ? '<p style="text-align:right; color:red; font-size:10px; font-weight:bold; margin-top:5px;">(ĐƠN HÀNG GHI NỢ)</p>' : ''}
             `;
             document.getElementById("modal-invoice").classList.remove("hidden");
         }
@@ -311,53 +330,48 @@
         function closeInvoice() { document.getElementById("modal-invoice").classList.add("hidden"); }
 
         function render() {
-            // Select lists
             let pS = document.getElementById("pselect"), sP = document.getElementById("sellProduct");
-            let opts = products.length ? products.map((p, i) => `<option value="${i}">${p.name}</option>`).join('') : '<option value="">(Trống)</option>';
+            let opts = products.length ? products.map((p, i) => `<option value="${i}">${p.name}</option>`).join('') : '<option value="">(Chưa có vải)</option>';
             pS.innerHTML = opts; sP.innerHTML = opts;
 
-            // Cart
             let cartDiv = document.getElementById("cart");
             let t = 0;
             cartDiv.innerHTML = cart.length ? cart.map((c, i) => {
                 t += c.total;
-                return `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <div><p class="font-bold text-xs">${c.product} (${c.code})</p><p class="text-[9px] font-bold text-slate-400">${c.qty}m x ${f(c.price)}</p></div>
-                    <div class="flex items-center gap-3"><span class="font-black text-slate-700 text-sm">${f(c.total)}</span><button onclick="cart.splice(${i},1);render();" class="text-red-400 font-bold px-1 text-lg">×</button></div>
+                return `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div><p class="font-black text-xs">${c.product} - ${c.code}</p><p class="text-[10px] font-bold text-slate-400">${c.qty}m x ${f(c.price)}đ</p></div>
+                    <div class="flex items-center gap-3"><span class="font-black text-blue-700 text-sm">${f(c.total)}</span><button onclick="cart.splice(${i},1);render();" class="text-red-400 font-bold px-1 text-xl">×</button></div>
                 </div>`;
-            }).join('') : '<p class="text-center text-slate-300 py-4 text-[10px] italic">Giỏ hàng trống</p>';
-            document.getElementById("sum").innerText = f(t) + " VND";
+            }).join('') : '<p class="text-center text-slate-300 py-6 text-[11px] font-bold uppercase tracking-widest">Giỏ hàng đang trống</p>';
+            document.getElementById("sum").innerText = f(t) + "đ";
 
-            // Reports
             let todayTotal = 0, monthTotal = 0, now = new Date();
             let historyHTML = "";
             bills.slice().reverse().forEach(b => {
                 let d = new Date(b.time);
                 if(d.toDateString() === now.toDateString()) {
                     todayTotal += b.total;
-                    historyHTML += `
-                        <div class="flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm mb-2">
-                            <div><p class="font-black text-xs text-slate-700">${b.name}</p><p class="text-[9px] text-slate-400">${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${f(b.total)}đ</p></div>
-                            <button onclick='showInvoice(${JSON.stringify(b)})' class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-[10px] font-black uppercase">Xem lại</button>
-                        </div>`;
+                    historyHTML += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 mb-2">
+                        <div><p class="font-black text-xs">${b.name}</p><p class="text-[9px] font-bold text-slate-400">${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • ${f(b.total)}đ</p></div>
+                        <button onclick='showInvoice(${JSON.stringify(b)})' class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-[9px] font-black uppercase">Xem hóa đơn</button>
+                    </div>`;
                 }
                 if(d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) monthTotal += b.total;
             });
-            document.getElementById("today").innerText = f(todayTotal) + " VND";
-            document.getElementById("month").innerText = f(monthTotal) + " VND";
-            document.getElementById("billHistory").innerHTML = historyHTML || '<p class="text-center text-slate-300 py-4 text-[10px]">Chưa có đơn hàng nào.</p>';
+            document.getElementById("today").innerText = f(todayTotal) + "đ";
+            document.getElementById("month").innerText = f(monthTotal) + "đ";
+            document.getElementById("billHistory").innerHTML = historyHTML || '<p class="text-center text-slate-300 py-4 text-[10px]">Chưa có đơn hàng hôm nay.</p>';
 
-            // Debts
             document.getElementById("customerList").innerHTML = customers.filter(c => c.debt > 0).map(c => 
-                `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border-l-4 border-red-500">
-                    <div><p class="font-bold text-slate-800 text-xs">${c.name}</p><p class="text-[9px] text-slate-400">${c.phone}</p></div>
-                    <div class="text-right"><p class="text-red-600 font-black text-sm">${f(c.debt)}</p><button onclick="payDebt('${c.phone}')" class="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded font-black mt-1">Trả nợ</button></div>
+                `<div class="flex justify-between items-center p-3 bg-red-50/50 rounded-xl border border-red-100">
+                    <div><p class="font-black text-xs text-slate-700">${c.name}</p><p class="text-[9px] font-bold text-slate-400">${c.phone}</p></div>
+                    <div class="text-right"><p class="text-red-600 font-black text-sm">${f(c.debt)}đ</p><button onclick="payDebt('${c.phone}')" class="text-[9px] bg-green-600 text-white px-3 py-1 rounded-lg font-black uppercase mt-1 shadow-sm">Trả nợ</button></div>
                 </div>`
-            ).join('') || '<p class="text-center text-slate-300 py-4 text-[10px]">Không có nợ.</p>';
+            ).join('') || '<p class="text-center text-slate-300 py-4 text-[10px]">Không có khách nợ.</p>';
         }
 
         function payDebt(phone) {
-            let amount = parseFloat(prompt("Số tiền khách trả:"));
+            let amount = parseFloat(prompt("Nhập số tiền khách trả nợ:"));
             if(!isNaN(amount) && amount > 0) {
                 let c = customers.find(x => x.phone === phone);
                 c.debt = Math.max(0, c.debt - amount);
@@ -365,7 +379,16 @@
             }
         }
 
-        function clearAllData() { if(confirm("Xóa toàn bộ dữ liệu vĩnh viễn?")) { localStorage.clear(); location.reload(); } }
+        function exportData() {
+            const data = { products, bills, customers };
+            const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `SaoLuu_KhoVaiTD_${new Date().toLocaleDateString('vi-VN')}.json`;
+            a.click();
+        }
+
+        function clearAllData() { if(confirm("XÓA TẤT CẢ DỮ LIỆU? Hành động này không thể hoàn tác!")) { localStorage.clear(); location.reload(); } }
 
         render();
         loadVariants();
