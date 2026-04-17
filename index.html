@@ -3,180 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phần Mềm Quản Lý Vải - Bích Thảo</title>
+    <title>Quản Lý Kho Nội Bộ - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none; }
         .active-tab { color: #2563eb; border-bottom: 3px solid #2563eb; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .card { background: white; border-radius: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 1rem; }
+        .card { background: white; border-radius: 1.25rem; shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 1.25rem; }
+        .invoice-box { border: 2px dashed #000; padding: 1.5rem; background: #fff; font-family: 'Courier New', monospace; color: #000; }
     </style>
 </head>
-<body class="bg-[#F4F7FA] pb-24 text-gray-800">
+<body class="bg-[#F8FAFC] pb-24 text-slate-800">
 
     <div class="max-w-md mx-auto bg-white border-b sticky top-0 z-50">
         <div class="p-4 flex justify-between items-center">
-            <h1 class="text-xl font-black text-blue-600 uppercase tracking-tighter">Vải Bích Thảo</h1>
-            <button onclick="clearAllData()" class="text-[10px] text-gray-300 font-bold">Xóa hết dữ liệu</button>
+            <h1 class="text-xl font-black text-blue-700 tracking-tighter uppercase italic">Vải Bích Thảo</h1>
+            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">SẴN SÀNG</span>
         </div>
-        <div class="flex justify-around">
-            <button onclick="switchTab('pos')" id="btn-pos" class="tab-btn py-3 px-4 font-bold active-tab">Bán Hàng</button>
-            <button onclick="switchTab('stock')" id="btn-stock" class="tab-btn py-3 px-4 font-bold text-gray-400">Nhập Kho</button>
-            <button onclick="switchTab('report')" id="btn-report" class="tab-btn py-3 px-4 font-bold text-gray-400">Báo Cáo</button>
+        <div class="flex justify-around text-xs font-black">
+            <button onclick="switchTab('pos')" id="btn-pos" class="tab-btn py-3 px-4 active-tab uppercase">Bán Hàng</button>
+            <button onclick="switchTab('stock')" id="btn-stock" class="tab-btn py-3 px-4 text-slate-400 uppercase">Nhập Kho</button>
+            <button onclick="switchTab('report')" id="btn-report" class="tab-btn py-3 px-4 text-slate-400 uppercase">Dữ Liệu</button>
         </div>
     </div>
 
     <div class="max-w-md mx-auto p-4 space-y-4">
 
         <section id="tab-pos" class="tab-content space-y-4">
-            <div class="card space-y-3">
-                <h3 class="font-bold border-b pb-2 flex justify-between items-center">
-                    Cắt vải cho khách
-                    <span id="pos-stock-info" class="text-xs font-normal text-blue-500 italic"></span>
-                </h3>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-400">Loại Vải</label>
-                        <select id="sellProduct" onchange="loadVariants()" class="w-full bg-gray-50 border rounded-lg p-2 font-medium"></select>
+            <div class="card bg-white shadow-xl shadow-slate-200/50 space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-blue-700">🛒 Tạo Đơn Hàng</h3>
+                    <span id="pos-stock-tag" class="text-[10px] font-bold text-orange-500"></span>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Loại vải</label>
+                            <select id="sellProduct" onchange="loadVariants()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500"></select>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Mã hàng / Màu</label>
+                            <select id="sellVariant" onchange="updatePrice()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 outline-none focus:border-blue-500"></select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-400">Mã màu</label>
-                        <select id="sellVariant" onchange="updatePrice()" class="w-full bg-gray-50 border rounded-lg p-2 font-medium"></select>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Số mét cắt</label>
+                            <input id="met" type="number" step="0.01" placeholder="0.00" oninput="updatePrice()" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 font-bold text-lg text-blue-600">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase">Thành tiền</label>
+                            <div id="totalShow" class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl p-3 font-black text-blue-700 text-lg">0 VND</div>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-400">Số mét khách cắt</label>
-                        <input id="met" type="number" step="0.01" placeholder="0.0" oninput="updatePrice()" class="w-full bg-gray-50 border rounded-lg p-2 font-bold text-lg">
-                    </div>
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-400">Thành tiền (đ)</label>
-                        <input id="totalShow" readonly class="w-full bg-blue-50 border-blue-100 border rounded-lg p-2 font-bold text-blue-600 text-lg">
-                    </div>
-                </div>
-                <button onclick="addCart()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold active:scale-95 transition">THÊM VÀO ĐƠN</button>
+                <button onclick="addCart()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition">THÊM VÀO GIỎ</button>
             </div>
 
-            <div class="card">
-                <h3 class="font-bold border-b pb-2 mb-3">Đơn hàng đang chờ</h3>
-                <div id="cart" class="space-y-2 text-sm max-h-40 overflow-y-auto"></div>
-                <div class="border-t mt-3 pt-3 flex justify-between items-center">
-                    <span class="font-bold text-gray-500 uppercase text-xs">Tổng tiền</span>
-                    <span id="sum" class="text-2xl font-black text-red-600">0</span>
-                </div>
-                <div class="mt-4 space-y-2">
-                    <select id="customer" class="w-full border p-2 rounded-lg text-sm bg-gray-50"></select>
+            <div class="card bg-white border border-slate-100">
+                <h3 class="font-bold border-b pb-2 mb-3">📋 Chi tiết đơn hàng</h3>
+                <div id="cart" class="space-y-2 mb-4"></div>
+                
+                <div class="space-y-3 pt-3 border-t">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input id="custName" type="text" placeholder="Tên khách hàng" class="border rounded-lg p-2 text-sm bg-slate-50">
+                        <input id="custPhone" type="text" placeholder="Số điện thoại" class="border rounded-lg p-2 text-sm bg-slate-50">
+                    </div>
+                    <div class="flex justify-between items-center font-black text-xl px-1">
+                        <span class="text-slate-400 text-xs uppercase">Tổng tiền:</span>
+                        <span id="sum" class="text-red-600">0 VND</span>
+                    </div>
                     <div class="flex gap-2">
-                        <button onclick="checkout(false)" class="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold uppercase text-xs">Thanh Toán</button>
-                        <button onclick="checkout(true)" class="flex-1 bg-orange-500 text-white py-3 rounded-xl font-bold uppercase text-xs">Ghi Nợ</button>
+                        <button onclick="checkout(false)" class="flex-1 bg-green-600 text-white py-4 rounded-xl font-bold uppercase text-xs">Thanh toán</button>
+                        <button onclick="checkout(true)" class="flex-1 bg-slate-800 text-white py-4 rounded-xl font-bold uppercase text-xs">Ghi nợ</button>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="tab-stock" class="tab-content hidden space-y-4">
-            <div class="card">
-                <h3 class="font-bold mb-3">1. Tạo Tên Loại Vải</h3>
+            <div class="card bg-white border border-slate-100">
+                <h3 class="font-bold mb-3 text-blue-700">1. Đăng ký loại vải mới</h3>
                 <div class="flex gap-2">
-                    <input id="name" type="text" placeholder="Ví dụ: Lụa satin, Linen..." class="flex-1 border p-3 rounded-lg outline-none focus:border-blue-600">
-                    <button onclick="addProduct()" class="bg-blue-600 text-white px-6 rounded-lg font-bold">Thêm</button>
+                    <input id="name" type="text" placeholder="VD: Lụa satin, Cotton..." class="flex-1 border-2 border-slate-50 p-3 rounded-xl outline-none focus:border-blue-500">
+                    <button onclick="addProduct()" class="bg-blue-700 text-white px-6 rounded-xl font-bold">LƯU</button>
                 </div>
             </div>
 
-            <div class="card space-y-3">
-                <h3 class="font-bold">2. Nhập Chi Tiết Mã/Màu</h3>
-                <div>
-                    <label class="text-[10px] uppercase font-bold text-gray-400">Chọn vải vừa tạo</label>
-                    <select id="pselect" class="w-full border p-3 rounded-lg bg-gray-50"></select>
+            <div class="card bg-white border border-slate-100 space-y-3">
+                <h3 class="font-bold text-blue-700">2. Nhập Mã Sản Phẩm (Mã cây)</h3>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400">CHỌN LOẠI VẢI</label>
+                    <select id="pselect" class="w-full border-2 border-slate-50 p-3 rounded-xl bg-slate-50 font-bold"></select>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <input id="code" type="text" placeholder="Mã hàng" class="border p-3 rounded-lg">
-                    <input id="color" type="text" placeholder="Màu sắc" class="border p-3 rounded-lg">
+                    <input id="code" type="text" placeholder="Mã hàng (L01)" class="border-2 border-slate-50 p-3 rounded-xl outline-none">
+                    <input id="color" type="text" placeholder="Màu sắc" class="border-2 border-slate-50 p-3 rounded-xl outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <input id="price" type="number" placeholder="Giá bán/Mét" class="border p-3 rounded-lg">
-                    <input id="stock" type="number" step="0.1" placeholder="Số mét tồn" class="border p-3 rounded-lg font-bold">
+                    <input id="price" type="number" placeholder="Giá / m (VND)" class="border-2 border-slate-50 p-3 rounded-xl font-bold outline-none">
+                    <input id="stock" type="number" step="0.01" placeholder="Số mét tồn" class="border-2 border-slate-50 p-3 rounded-xl font-bold outline-none">
                 </div>
-                <button onclick="addVariant()" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold uppercase">Xác nhận nhập kho</button>
+                <button onclick="addVariant()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-orange-100 active:scale-95 transition">XÁC NHẬN NHẬP KHO</button>
             </div>
         </section>
 
         <section id="tab-report" class="tab-content hidden space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-                <div class="card">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">Hôm nay</p>
-                    <p id="today" class="text-xl font-black text-blue-600">0đ</p>
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div class="card bg-blue-700 text-white">
+                    <p class="text-[10px] font-bold opacity-70 uppercase tracking-widest">Hôm nay</p>
+                    <p id="today" class="text-lg font-black tracking-tight">0 VND</p>
                 </div>
-                <div class="card">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase">Tháng này</p>
-                    <p id="month" class="text-xl font-black text-gray-800">0đ</p>
+                <div class="card bg-white border">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tháng này</p>
+                    <p id="month" class="text-lg font-black text-slate-800 tracking-tight">0 VND</p>
                 </div>
             </div>
 
             <div class="card">
-                <h3 class="font-bold mb-3">Quản lý Khách hàng</h3>
-                <div class="space-y-2">
-                    <input id="cname" type="text" placeholder="Tên khách hàng" class="w-full border p-3 rounded-lg">
-                    <input id="phone" type="text" placeholder="Số điện thoại" class="w-full border p-3 rounded-lg">
-                    <button onclick="addCustomer()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Lưu thông tin</button>
-                </div>
+                <h3 class="font-bold mb-3 border-b pb-2 flex justify-between">
+                    Sổ Nợ Khách Hàng
+                    <span class="text-[10px] text-red-500 font-black">NỢ CHƯA TRẢ</span>
+                </h3>
+                <div id="customerList" class="space-y-3"></div>
             </div>
+            
+            <button onclick="clearAllData()" class="w-full py-3 text-slate-300 text-[10px] font-bold uppercase tracking-widest underline">Xóa sạch toàn bộ dữ liệu máy này</button>
         </section>
 
+        <div id="modal-invoice" class="fixed inset-0 bg-slate-900/90 z-[60] hidden flex items-center justify-center p-4">
+            <div class="bg-white w-full rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+                <div id="invoice-content" class="invoice-box"></div>
+                <button onclick="closeInvoice()" class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black text-sm uppercase">HOÀN TẤT & IN TIẾP</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- DATA ---
-        let products = JSON.parse(localStorage.getItem("products") || "[]");
-        let bills = JSON.parse(localStorage.getItem("bills") || "[]");
-        let customers = JSON.parse(localStorage.getItem("customers") || "[]");
+        // --- CƠ SỞ DỮ LIỆU ---
+        let products = JSON.parse(localStorage.getItem("vbt_v5_products") || "[]");
+        let bills = JSON.parse(localStorage.getItem("vbt_v5_bills") || "[]");
+        let customers = JSON.parse(localStorage.getItem("vbt_v5_customers") || "[]");
         let cart = [];
 
         function save() {
-            localStorage.setItem("products", JSON.stringify(products));
-            localStorage.setItem("bills", JSON.stringify(bills));
-            localStorage.setItem("customers", JSON.stringify(customers));
+            localStorage.setItem("vbt_v5_products", JSON.stringify(products));
+            localStorage.setItem("vbt_v5_bills", JSON.stringify(bills));
+            localStorage.setItem("vbt_v5_customers", JSON.stringify(customers));
         }
 
-        function f(n) { return Number(n || 0).toLocaleString("vi-VN"); }
+        function f(n) { return Math.round(n || 0).toLocaleString("vi-VN"); }
 
-        // --- NAVIGATION ---
+        // --- ĐIỀU HƯỚNG ---
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-' + id).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab', 'text-gray-400'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab', 'text-slate-400'));
             document.getElementById('btn-' + id).classList.add('active-tab');
+            render();
         }
 
-        // --- KHO ---
+        // --- QUẢN LÝ KHO ---
         function addProduct() {
-            let name = document.getElementById("name").value.trim();
+            let nameInput = document.getElementById("name");
+            let name = nameInput.value.trim();
             if(!name) return alert("Vui lòng nhập tên loại vải!");
             products.push({name, variants: []});
-            document.getElementById("name").value = "";
+            nameInput.value = "";
             save(); render();
         }
 
         function addVariant() {
-            let pIndex = document.getElementById("pselect").value;
+            let pIdx = document.getElementById("pselect").value;
             let code = document.getElementById("code").value.trim();
             let color = document.getElementById("color").value.trim();
             let price = parseFloat(document.getElementById("price").value) || 0;
             let stock = parseFloat(document.getElementById("stock").value) || 0;
 
-            if(pIndex === "") return alert("Chọn loại vải trước!");
-            if(!code || !color) return alert("Nhập mã màu!");
+            if(pIdx === "" || !code) return alert("Vui lòng chọn vải và nhập mã hàng!");
 
-            products[pIndex].variants.push({code, color, price, stock});
-            
-            // Reset form
+            products[pIdx].variants.push({code, color, price, stock: Number(stock.toFixed(2))});
             document.getElementById("code").value = "";
             document.getElementById("color").value = "";
             document.getElementById("stock").value = "";
-            
             save(); render();
-            alert("Đã nhập kho thành công!");
+            alert("Đã nhập mã cây vải thành công!");
         }
 
         // --- BÁN HÀNG ---
@@ -184,10 +197,9 @@
             let pIdx = document.getElementById("sellProduct").value;
             let vSelect = document.getElementById("sellVariant");
             vSelect.innerHTML = "";
-            
-            if(pIdx !== "" && products[pIdx] && products[pIdx].variants) {
+            if(pIdx !== "" && products[pIdx]) {
                 products[pIdx].variants.forEach((v, i) => {
-                    vSelect.innerHTML += `<option value="${i}">${v.code} - ${v.color} (Tồn: ${v.stock}m)</option>`;
+                    vSelect.innerHTML += `<option value="${i}">${v.code} - ${v.color} (${v.stock}m)</option>`;
                 });
             }
             updatePrice();
@@ -196,12 +208,16 @@
         function updatePrice() {
             let pIdx = document.getElementById("sellProduct").value;
             let vIdx = document.getElementById("sellVariant").value;
-            let met = parseFloat(document.getElementById("met").value) || 0;
+            let metInput = document.getElementById("met");
+            let met = parseFloat(metInput.value) || 0;
             
             if(pIdx !== "" && vIdx !== "" && products[pIdx].variants[vIdx]) {
                 let v = products[pIdx].variants[vIdx];
-                document.getElementById("totalShow").value = f(v.price * met);
-                document.getElementById("pos-stock-info").innerText = "Kho còn: " + v.stock + "m";
+                document.getElementById("totalShow").innerText = f(v.price * met) + " VND";
+                document.getElementById("pos-stock-tag").innerText = "SẴN CÓ: " + v.stock + "M";
+            } else {
+                document.getElementById("totalShow").innerText = "0 VND";
+                document.getElementById("pos-stock-tag").innerText = "";
             }
         }
 
@@ -210,122 +226,167 @@
             let vIdx = document.getElementById("sellVariant").value;
             let met = parseFloat(document.getElementById("met").value) || 0;
 
-            if(pIdx === "" || vIdx === "" || met <= 0) return alert("Kiểm tra lại số mét và loại vải!");
+            if(pIdx === "" || vIdx === "" || met <= 0) return alert("Hãy nhập đầy đủ thông tin cắt vải!");
 
-            let p = products[pIdx];
-            let v = p.variants[vIdx];
-
-            if(met > v.stock) return alert("Số mét trong kho không đủ (Chỉ còn " + v.stock + "m)");
+            let v = products[pIdx].variants[vIdx];
+            if(met > v.stock) return alert("Kho không đủ hàng! Hiện còn: " + v.stock + "m");
 
             cart.push({
-                product: p.name,
+                product: products[pIdx].name,
                 code: v.code,
                 color: v.color,
-                qty: met,
+                qty: Number(met.toFixed(2)),
                 price: v.price,
                 total: v.price * met,
-                pIdx: pIdx, // để truy vết trừ kho sau này
-                vIdx: vIdx
+                pIdx, vIdx
             });
-
             document.getElementById("met").value = "";
             render();
         }
 
+        // --- THANH TOÁN & HÓA ĐƠN ---
         function checkout(isDebt) {
-            if(!cart.length) return alert("Đơn hàng đang trống!");
+            if(!cart.length) return alert("Giỏ hàng đang trống!");
+            let name = document.getElementById("custName").value.trim() || "Khách lẻ";
+            let phone = document.getElementById("custPhone").value.trim();
             let total = cart.reduce((a, b) => a + b.total, 0);
-            let cIdx = document.getElementById("customer").value;
 
-            if(isDebt && cIdx === "") return alert("Vui lòng chọn khách hàng để ghi nợ!");
-
-            // Trừ kho thực tế
+            // Trừ kho & Lưu nợ
             cart.forEach(item => {
-                let target = products[item.pIdx].variants[item.vIdx];
-                target.stock = Number((target.stock - item.qty).toFixed(2));
+                let v = products[item.pIdx].variants[item.vIdx];
+                v.stock = Number((v.stock - item.qty).toFixed(2));
             });
 
             if(isDebt) {
-                customers[cIdx].debt = (customers[cIdx].debt || 0) + total;
+                let c = customers.find(x => x.phone === phone && phone !== "");
+                if(c) {
+                    c.debt += total;
+                    c.name = name; // Cập nhật tên mới nhất
+                } else {
+                    customers.push({name, phone, debt: total});
+                }
             }
 
-            bills.push({
-                time: new Date(),
-                items: [...cart],
-                total: total
-            });
-
+            let bill = { id: Date.now(), time: new Date().toISOString(), name, phone, items: [...cart], total, isDebt };
+            bills.push(bill);
+            
+            showInvoice(bill);
             cart = [];
+            document.getElementById("custName").value = "";
+            document.getElementById("custPhone").value = "";
             save(); render();
-            alert("Thanh toán thành công: " + f(total) + "đ");
         }
 
-        function addCustomer() {
-            let name = document.getElementById("cname").value.trim();
-            let phone = document.getElementById("phone").value.trim();
-            if(!name) return alert("Nhập tên khách!");
-            customers.push({name, phone, debt: 0});
-            document.getElementById("cname").value = "";
-            document.getElementById("phone").value = "";
-            save(); render();
-            alert("Đã lưu thông tin khách!");
+        function showInvoice(bill) {
+            let dateStr = new Date(bill.time).toLocaleString('vi-VN');
+            let html = `
+                <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:10px;">
+                    <h2 style="margin:0; font-size:18px">VẢI BÍCH THẢO</h2>
+                    <p style="font-size:10px; margin:0">UY TÍN - TẬN TÂM</p>
+                </div>
+                <div style="font-size:12px; line-height:1.6">
+                    <p><b>Khách hàng:</b> ${bill.name}</p>
+                    <p><b>Số ĐT:</b> ${bill.phone || '---'}</p>
+                    <p><b>Ngày:</b> ${dateStr}</p>
+                </div>
+                <table style="width:100%; font-size:12px; margin:15px 0; border-collapse: collapse;">
+                    <tr style="border-bottom:1px solid #eee">
+                        <th style="text-align:left">Vải</th>
+                        <th style="text-align:right">Tiền</th>
+                    </tr>
+                    ${bill.items.map(i => `
+                        <tr style="border-bottom:1px dashed #eee">
+                            <td style="padding:5px 0">
+                                <b>${i.product}</b> (${i.code})<br>
+                                <small>${i.qty}m x ${f(i.price)}</small>
+                            </td>
+                            <td style="text-align:right">${f(i.total)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                <div style="text-align:right; font-weight:900; font-size:14px; margin-top:10px;">
+                    TỔNG: ${f(bill.total)} VND
+                    ${bill.isDebt ? '<p style="color:red; margin:0; font-size:11px">ĐƠN HÀNG GHI NỢ</p>' : ''}
+                </div>
+                <p style="text-align:center; font-size:10px; margin-top:30px; border-top:1px solid #000; pt-2">XIN CẢM ƠN QUÝ KHÁCH!</p>
+            `;
+            document.getElementById("invoice-content").innerHTML = html;
+            document.getElementById("modal-invoice").classList.remove("hidden");
         }
 
+        function closeInvoice() { document.getElementById("modal-invoice").classList.add("hidden"); }
+
+        // --- RENDER GIAO DIỆN ---
         function render() {
-            // Cập nhật các danh sách select
+            // Danh sách kho
             let pSelect = document.getElementById("pselect");
             let sellProduct = document.getElementById("sellProduct");
-            let pOptions = products.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
-            
+            let pOptions = products.length ? products.map((p, i) => `<option value="${i}">${p.name}</option>`).join('') : '<option value="">Chưa có vải</option>';
             pSelect.innerHTML = pOptions;
             sellProduct.innerHTML = pOptions;
 
-            // Cập nhật giỏ hàng
+            // Giỏ hàng
             let cartDiv = document.getElementById("cart");
-            let total = 0;
-            cartDiv.innerHTML = cart.map((c, i) => {
-                total += c.total;
-                return `<div class="flex justify-between items-center py-2 border-b">
-                            <div>
-                                <p class='font-bold'>${c.product} (${c.code})</p>
-                                <p class='text-xs text-gray-400'>${c.qty}m x ${f(c.price)}đ</p>
-                            </div>
-                            <div class='flex items-center gap-3'>
-                                <span class='font-bold text-blue-600'>${f(c.total)}</span>
-                                <button onclick="cart.splice(${i},1);render();" class="text-red-400 text-lg">×</button>
-                            </div>
-                        </div>`;
-            }).join('');
-            document.getElementById("sum").innerText = f(total);
-
-            // Cập nhật khách hàng
-            let custSelect = document.getElementById("customer");
-            custSelect.innerHTML = `<option value="">-- Chọn khách hàng --</option>` + customers.map((c, i) => 
-                `<option value="${i}">${c.name} - Nợ: ${f(c.debt)}đ</option>`
-            ).join('');
+            let t = 0;
+            if(!cart.length) {
+                cartDiv.innerHTML = '<p class="text-center text-slate-300 py-4 text-xs italic">Giỏ hàng đang trống...</p>';
+            } else {
+                cartDiv.innerHTML = cart.map((c, i) => {
+                    t += c.total;
+                    return `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <div class="leading-tight">
+                                    <p class="font-bold text-slate-800">${c.product} <span class="text-blue-600">(${c.code})</span></p>
+                                    <p class="text-[10px] font-bold text-slate-400">${c.qty}m x ${f(c.price)}</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-black text-slate-700">${f(c.total)}</span>
+                                    <button onclick="cart.splice(${i},1);render();" class="text-red-400 font-bold px-2 text-xl">×</button>
+                                </div>
+                            </div>`;
+                }).join('');
+            }
+            document.getElementById("sum").innerText = f(t) + " VND";
 
             // Báo cáo
-            let now = new Date();
             let todaySum = 0, monthSum = 0;
+            let now = new Date();
             bills.forEach(b => {
-                let bDate = new Date(b.time);
-                if(bDate.toDateString() === now.toDateString()) todaySum += b.total;
-                if(bDate.getMonth() === now.getMonth() && bDate.getFullYear() === now.getFullYear()) monthSum += b.total;
+                let d = new Date(b.time);
+                if(d.toDateString() === now.toDateString()) todaySum += b.total;
+                if(d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) monthSum += b.total;
             });
-            document.getElementById("today").innerText = f(todaySum) + "đ";
-            document.getElementById("month").innerText = f(monthSum) + "đ";
+            document.getElementById("today").innerText = f(todaySum) + " VND";
+            document.getElementById("month").innerText = f(monthSum) + " VND";
+
+            // Danh sách nợ
+            document.getElementById("customerList").innerHTML = customers.filter(c => c.debt > 0).map(c => 
+                `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border-l-4 border-red-500">
+                    <div>
+                        <p class="font-bold text-slate-800">${c.name}</p>
+                        <p class="text-[10px] text-slate-400 font-bold">${c.phone || 'Không có SĐT'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-red-600 font-black">${f(c.debt)}</p>
+                        <button onclick="payDebt('${c.phone}')" class="text-[9px] bg-green-100 text-green-700 px-2 py-1 rounded font-black uppercase mt-1">Trả Nợ</button>
+                    </div>
+                </div>`
+            ).join('') || '<p class="text-center text-slate-300 py-4 text-xs italic">Không có ai nợ...</p>';
         }
 
-        function clearAllData() {
-            if(confirm("Bạn có chắc chắn muốn XÓA SẠCH toàn bộ dữ liệu (Kho, Khách hàng, Hóa đơn)?")) {
-                localStorage.clear();
-                location.reload();
+        function payDebt(phone) {
+            let amount = parseFloat(prompt("Nhập số tiền khách trả:"));
+            if(amount > 0) {
+                let c = customers.find(x => x.phone === phone);
+                c.debt = Math.max(0, c.debt - amount);
+                save(); render();
             }
         }
 
-        // Khởi tạo lần đầu
+        function clearAllData() { if(confirm("CẢNH BÁO: Hành động này sẽ xóa sạch toàn bộ kho và hóa đơn. Bạn có chắc không?")) { localStorage.clear(); location.reload(); } }
+
+        // Chạy khởi tạo
         render();
-        loadVariants();
+        if(products.length > 0) loadVariants();
     </script>
 </body>
 </html>
