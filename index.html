@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kho Vải PRO MAX</title>
+<title>Kho Vải PRO</title>
 
 <style>
-body{font-family:-apple-system;margin:0;background:#f2f4f8}
+body{font-family:-apple-system;margin:0;background:#f5f6fa}
 
 /* HEADER */
 .header{background:white;padding:15px}
-.title{font-size:20px;font-weight:bold}
+.title{font-size:18px;font-weight:bold}
 .sub{color:#666;font-size:13px}
 
 /* CARD */
@@ -24,28 +24,10 @@ border-radius:8px;border:1px solid #ddd
 
 /* BUTTON */
 button{
-padding:10px;margin-top:8px;border:none;
-background:#2f80ed;color:white;border-radius:8px
-}
-
-/* GRID */
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-padding:10px;
-margin-bottom:260px;
-}
-
-.item{background:white;padding:10px;border-radius:10px}
-
-/* CART */
-.cart{
-position:fixed;
-bottom:70px;left:0;right:0;
-background:white;padding:10px;
-border-top:1px solid #ddd;
-max-height:250px;overflow:auto
+width:100%;
+padding:10px;margin-top:8px;
+border:none;background:#2f80ed;color:white;
+border-radius:8px
 }
 
 /* TAB */
@@ -56,11 +38,10 @@ background:white;padding:10px 0;
 border-top:1px solid #ddd
 }
 .center{
-width:70px;height:70px;
-background:#2f80ed;color:white;
-border-radius:50%;
+width:65px;height:65px;background:#2f80ed;
+color:white;border-radius:50%;
 display:flex;align-items:center;justify-content:center;
-margin-top:-30px
+margin-top:-30px;font-size:14px
 }
 
 .hidden{display:none}
@@ -70,51 +51,72 @@ margin-top:-30px
 <body>
 
 <div class="header">
-<div class="title">Xin chào Thảo</div>
-<div class="sub">hệ thống quản lý kho nội bộ</div>
+<div class="title">👋 Xin chào Thảo</div>
+<div class="sub">Kho nội bộ</div>
 </div>
 
 <!-- HOME -->
 <div id="home">
 <div class="card">
-<div>Doanh thu: <b id="rev">0</b></div>
-<div>Đơn hàng: <b id="ord">0</b></div>
-<div>Hóa đơn: <b id="inv">0</b></div>
+📊 Doanh thu: <b id="rev">0</b><br>
+📦 Đơn hàng: <b id="ord">0</b><br>
+🧾 Hóa đơn: <b id="inv">0</b>
 </div>
 </div>
 
 <!-- KHO -->
 <div id="kho" class="hidden">
 <div class="card">
-<input id="pname" placeholder="Tên vải">
+📦 Nhập hàng<br>
+<input id="code" placeholder="Mã hàng">
+<input id="name" placeholder="Tên vải">
 <input id="color" placeholder="Màu">
-<input id="importPrice" type="number" step="0.01" placeholder="Giá nhập">
-<input id="sellPrice" type="number" step="0.01" placeholder="Giá bán">
+<input id="import" type="number" step="0.01" placeholder="Giá nhập">
+<input id="price" type="number" step="0.01" placeholder="Giá bán">
 <input id="qty" type="number" step="0.01" placeholder="Số mét">
-<button onclick="addProduct()">Nhập hàng</button>
+<button onclick="add()">Thêm sản phẩm</button>
 </div>
-<div id="plist"></div>
+<div id="list"></div>
 </div>
 
 <!-- BÁN -->
 <div id="sell" class="hidden">
+<div class="card">
+🛒 Bán hàng<br>
 
-<input id="search" placeholder="Tìm sản phẩm..." oninput="render()">
+<select id="product" onchange="loadProduct()"></select>
 
-<div class="grid" id="grid"></div>
+<input id="showColor" placeholder="Màu" disabled>
+<input id="showPrice" placeholder="Giá bán" disabled>
 
-<div class="cart">
-<div id="cart"></div>
-<div><b>Tổng: <span id="sum">0</span> VNĐ</b></div>
+<input id="met" type="number" step="0.01" placeholder="Số mét">
+<input id="total" placeholder="Thành tiền" disabled>
 
-<select id="customer">
-<option value="">Khách lẻ</option>
-</select>
-
-<button onclick="checkout(false)">Thanh toán</button>
-<button onclick="checkout(true)">Ghi nợ</button>
+<button onclick="addCart()">Thêm vào đơn</button>
+<button onclick="checkout()">Thanh toán</button>
 </div>
 
+<div id="cart"></div>
+</div>
+
+<!-- KHÁCH -->
+<div id="customer" class="hidden">
+<div class="card">
+👤 Khách hàng<br>
+<input id="cname" placeholder="Tên">
+<input id="phone" placeholder="SĐT">
+<button onclick="addCustomer()">Lưu khách</button>
+</div>
+<div id="clist"></div>
+</div>
+
+<!-- BÁO CÁO -->
+<div id="report" class="hidden">
+<div class="card">
+📊 Báo cáo<br>
+Hôm nay: <b id="today">0</b><br>
+Tháng: <b id="month">0</b>
+</div>
 </div>
 
 <!-- TAB -->
@@ -122,8 +124,8 @@ margin-top:-30px
 <div onclick="tab('home')">Trang chủ</div>
 <div onclick="tab('kho')">Kho</div>
 <div class="center" onclick="tab('sell')">Bán</div>
-<div>Khách</div>
-<div>Báo cáo</div>
+<div onclick="tab('customer')">Khách</div>
+<div onclick="tab('report')">Báo cáo</div>
 </div>
 
 <script>
@@ -141,106 +143,110 @@ localStorage.setItem("c",JSON.stringify(customers));
 function format(n){return n.toLocaleString("vi-VN");}
 
 function tab(id){
-["home","kho","sell"].forEach(x=>{
+["home","kho","sell","customer","report"].forEach(x=>{
 document.getElementById(x).classList.add("hidden")
 });
 document.getElementById(id).classList.remove("hidden");
 render();
 }
 
-/* ADD PRODUCT */
-function addProduct(){
+/* KHO */
+function add(){
 products.push({
 id:Date.now(),
-name:pname.value,
+code:code.value,
+name:name.value,
 color:color.value,
-importPrice:+importPrice.value,
-sellPrice:+sellPrice.value,
+import:+import.value,
+price:+price.value,
 stock:+qty.value
 });
 save();render();
 }
 
-/* ADD CART */
-function addCart(id){
-let q=parseFloat(document.getElementById("q"+id).value);
-if(!q) return;
+/* BÁN */
+function loadProduct(){
+let p=products[product.value];
+showColor.value=p.color;
+showPrice.value=format(p.price);
+}
 
-let p=products.find(x=>x.id==id);
+met.oninput=function(){
+let p=products[product.value];
+total.value=format(p.price * met.value);
+}
+
+function addCart(){
+let p=products[product.value];
+let m=parseFloat(met.value);
 
 cart.push({
-name:p.name+"-"+p.color,
-qty:q,
-price:p.sellPrice,
-total:q*p.sellPrice
+name:p.name,
+qty:m,
+total:p.price*m
 });
 render();
 }
 
-/* CHECKOUT */
-function checkout(debt){
-let total=cart.reduce((a,b)=>a+b.total,0);
-
-cart.forEach(c=>{
-let p=products.find(x=>c.name.includes(x.name));
-p.stock-=c.qty;
-});
-
-bills.push({
-time:new Date(),
-total,
-debt
-});
+function checkout(){
+let sum=cart.reduce((a,b)=>a+b.total,0);
+bills.push({time:new Date(),total:sum});
 
 cart=[];
 save();render();
+}
 
-alert("Tổng: "+format(total));
+/* KHÁCH */
+function addCustomer(){
+customers.push({name:cname.value,phone:phone.value});
+save();render();
 }
 
 /* RENDER */
 function render(){
 
-let kw=search?.value||"";
-
-/* GRID */
-grid.innerHTML="";
-products.filter(p=>p.name.includes(kw)).forEach(p=>{
-grid.innerHTML+=`
-<div class="item">
-<b>${p.name}</b><br>
-${p.color}<br>
-Giá: ${format(p.sellPrice)}<br>
-Tồn: ${p.stock}m
-<input id="q${p.id}" type="number" step="0.01" placeholder="Mét">
-<button onclick="addCart(${p.id})">Thêm</button>
-</div>`;
+/* PRODUCT SELECT */
+product.innerHTML="";
+products.forEach((p,i)=>{
+product.innerHTML+=`<option value="${i}">${p.name} - ${p.color}</option>`;
 });
 
-/* CART */
-let html="",t=0;
-cart.forEach(c=>{
-t+=c.total;
-html+=`<div>${c.name} (${c.qty}) - ${format(c.total)}</div>`;
+/* LIST */
+list.innerHTML="";
+products.forEach(p=>{
+list.innerHTML+=`<div class="card">${p.code} - ${p.name} (${p.color}) - ${p.stock}m</div>`;
 });
-cart.innerHTML=html;
-sum.innerText=format(t);
+
+/* CUSTOMER */
+clist.innerHTML="";
+customers.forEach(c=>{
+clist.innerHTML+=`<div class="card">${c.name} - ${c.phone}</div>`;
+});
 
 /* DASH */
 let rev=0;
 bills.forEach(b=>rev+=b.total);
-
 rev.innerText=format(rev);
 ord.innerText=bills.length;
 inv.innerText=bills.length;
 
-/* LIST */
-plist.innerHTML="";
-products.forEach(p=>{
-plist.innerHTML+=`
-<div class="card">
-${p.name} - ${p.color} - ${p.stock}m
-</div>`;
+/* REPORT */
+let todayVal=0,monthVal=0;
+let now=new Date();
+
+bills.forEach(b=>{
+let d=new Date(b.time);
+if(d.toDateString()==now.toDateString()) todayVal+=b.total;
+if(d.getMonth()==now.getMonth()) monthVal+=b.total;
+});
+
+today.innerText=format(todayVal);
+month.innerText=format(monthVal);
+
+/* CART */
+cart.innerHTML="";
+cart.forEach(c=>{
+cart.innerHTML+=`<div class="card">${c.name} - ${c.qty}m - ${format(c.total)}</div>`;
 });
 }
 
