@@ -3,92 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kho Vải PRO MAX</title>
+<title>Kho Vải PRO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f7fb;}
-.header{padding:15px;font-size:18px;font-weight:bold;}
-.card{background:white;margin:10px;padding:15px;border-radius:12px;}
-input,select{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #ddd;}
-button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#2f80ed;color:white;font-weight:bold;}
-.item{border-bottom:1px solid #eee;padding:8px 0;}
-.bottom{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:white;padding:10px 0;border-top:1px solid #ddd;}
-.center{background:#2f80ed;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;top:-20px;}
-.hidden{display:none;}
-.small{font-size:12px;color:gray;}
+body{margin:0;font-family:-apple-system;background:#f4f6f9}
+
+/* UI */
+.header{padding:15px;background:white;font-weight:bold}
+.card{background:white;margin:10px;padding:15px;border-radius:12px}
+input,select{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #ddd}
+.btn{background:#2f80ed;color:white;padding:12px;border-radius:10px;text-align:center;margin-top:10px}
+.row{display:flex;gap:5px}
+.row input{flex:1}
+.item{border-bottom:1px solid #eee;padding:8px 0}
+
+.bottom{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:white;padding:10px;border-top:1px solid #ddd}
+.tab{font-size:12px}
+.center{background:#2f80ed;color:white;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;margin-top:-30px}
+.hidden{display:none}
 </style>
 </head>
 
 <body>
 
+<div class="header">Kho Vải PRO</div>
+
+<!-- HOME -->
 <div id="home">
-<div class="header">Dashboard</div>
-<div class="card">
-Hôm nay: <b id="today">0</b><br>
-Tháng: <b id="month">0</b><br>
-Lãi: <b id="profit">0</b>
-</div>
+<div class="card" id="dash"></div>
 </div>
 
+<!-- KHO -->
 <div id="kho" class="hidden">
 <div class="card">
-<input id="fabricName" placeholder="Tên vải">
-<div id="importList"></div>
-<button onclick="addRow()">+ Dòng</button>
-<button onclick="saveImport()">Lưu</button>
+<input id="fabric" placeholder="Tên vải">
+<div id="rows"></div>
+<div class="btn" onclick="addRow()">+ Dòng</div>
+<div class="btn" onclick="saveImport()">Lưu</div>
 </div>
-<div class="card" id="stockList"></div>
-</div>
-
-<div id="customer" class="hidden">
-<div class="card">
-<input id="cname" placeholder="Tên khách">
-<button onclick="addCustomer()">Thêm</button>
-</div>
-<div class="card" id="customerList"></div>
+<div class="card" id="stock"></div>
 </div>
 
+<!-- BÁN -->
 <div id="sell" class="hidden">
 <div class="card">
-<select id="sellSKU"></select>
-<select id="sellCustomer"></select>
-<input id="sellQty" type="number" step="0.01" placeholder="Số mét">
-<label><input type="checkbox" id="isDebt"> Ghi nợ</label>
-<button onclick="sell()">Bán & In hoá đơn</button>
+<select id="product"></select>
+<input id="qty" type="number" step="0.01" placeholder="Số mét">
+<div class="btn" onclick="addCart()">Thêm vào giỏ</div>
+</div>
+
+<div class="card" id="cart"></div>
+
+<div class="card">
+<select id="customer"></select>
+<label><input type="checkbox" id="debt"> Ghi nợ</label>
+<div class="btn" onclick="checkout()">Thanh toán</div>
 </div>
 </div>
 
+<!-- KHÁCH -->
+<div id="cus" class="hidden">
+<div class="card">
+<input id="cname" placeholder="Tên khách">
+<div class="btn" onclick="addCus()">Thêm</div>
+</div>
+<div class="card" id="cusList"></div>
+</div>
+
+<!-- REPORT -->
 <div id="report" class="hidden">
 <div class="card" id="reportBox"></div>
 </div>
 
+<!-- TAB -->
 <div class="bottom">
-<div onclick="show('home')">🏠</div>
-<div onclick="show('kho')">📦</div>
-<div class="center" onclick="show('sell')">🛒</div>
-<div onclick="show('customer')">👤</div>
-<div onclick="show('report')">📊</div>
+<div class="tab" onclick="show('home')">Trang chủ</div>
+<div class="tab" onclick="show('kho')">Kho</div>
+<div class="center" onclick="show('sell')">Bán</div>
+<div class="tab" onclick="show('cus')">Khách</div>
+<div class="tab" onclick="show('report')">Báo cáo</div>
 </div>
 
 <script>
 let skus=JSON.parse(localStorage.getItem("skus")||"[]");
+let bills=JSON.parse(localStorage.getItem("bills")||"[]");
 let customers=JSON.parse(localStorage.getItem("customers")||"[]");
-let invoices=JSON.parse(localStorage.getItem("invoices")||"[]");
+let cart=[];
 
 function save(){
 localStorage.setItem("skus",JSON.stringify(skus));
+localStorage.setItem("bills",JSON.stringify(bills));
 localStorage.setItem("customers",JSON.stringify(customers));
-localStorage.setItem("invoices",JSON.stringify(invoices));
 }
 setInterval(save,2000);
 
 function show(id){
-["home","kho","sell","customer","report"].forEach(x=>{
+["home","kho","sell","cus","report"].forEach(x=>{
 document.getElementById(x).classList.add("hidden");
 });
 document.getElementById(id).classList.remove("hidden");
 }
 
+/* KHO */
 function addRow(){
 let d=document.createElement("div");
 d.innerHTML=`
@@ -97,133 +113,120 @@ d.innerHTML=`
 <input type="number" step="0.01" placeholder="Giá nhập">
 <input type="number" step="0.01" placeholder="Giá bán">
 <input type="number" step="0.01" placeholder="Số mét">`;
-importList.appendChild(d);
+rows.appendChild(d);
 }
 
 function saveImport(){
-let name=fabricName.value;
-let rows=importList.children;
-
-for(let r of rows){
+let name=fabric.value;
+rows.querySelectorAll("div").forEach(r=>{
 let i=r.querySelectorAll("input");
 let code=i[0].value;
 let color=i[1].value;
 let ip=+i[2].value||0;
 let p=+i[3].value||0;
 let q=+i[4].value||0;
-
-if(!code) continue;
-
+if(!code) return;
 let ex=skus.find(s=>s.code==code);
-if(ex){ex.stock+=q;}
-else{skus.push({name,code,color,importPrice:ip,price:p,stock:q});}
+if(ex) ex.stock+=q;
+else skus.push({name,code,color,importPrice:ip,price:p,stock:q});
+});
+rows.innerHTML=""; addRow(); save(); render();
 }
 
-importList.innerHTML="";
-addRow();
-fabricName.value="";
-save();render();
+/* CART */
+function addCart(){
+let s=skus[product.value];
+let q=+qty.value;
+if(!s||!q) return;
+
+cart.push({
+name:s.name+"-"+s.color,
+price:s.price,
+qty:q,
+total:q*s.price
+});
+
+renderCart();
+qty.value="";
 }
 
-function addCustomer(){
-if(!cname.value) return;
+function renderCart(){
+cart.innerHTML="";
+let html=""; let sum=0;
+
+cart.forEach((c,i)=>{
+sum+=c.total;
+html+=`<div class="item">
+${c.name} | ${c.qty}m | ${c.total}
+<button onclick="remove(${i})">X</button>
+</div>`;
+});
+
+html+=`<b>Tổng: ${sum}</b>`;
+document.getElementById("cart").innerHTML=html;
+}
+
+function remove(i){
+cart.splice(i,1);
+renderCart();
+}
+
+/* CHECKOUT */
+function checkout(){
+if(cart.length==0) return;
+
+let total=cart.reduce((a,b)=>a+b.total,0);
+
+if(debt.checked){
+customers[customer.value].debt+=total;
+}
+
+bills.push({time:new Date(),total});
+
+cart=[];
+renderCart();
+save(); render();
+
+window.print();
+}
+
+/* CUSTOMER */
+function addCus(){
 customers.push({name:cname.value,debt:0});
 cname.value="";
 save();render();
 }
 
-function sell(){
-let s=skus[sellSKU.value];
-let c=customers[sellCustomer.value];
-let q=+sellQty.value;
-
-if(!s||!c||!q) return alert("Thiếu dữ liệu");
-if(s.stock<q) return alert("Không đủ");
-
-s.stock-=q;
-
-let total=q*s.price;
-let profit=q*(s.price-s.importPrice);
-
-if(isDebt.checked) c.debt+=total;
-
-let bill={
-time:new Date(),
-customer:c.name,
-item:s.name+"-"+s.color,
-qty:q,
-total,
-profit
-};
-
-invoices.push(bill);
-
-printInvoice(bill);
-
-sellQty.value="";
-save();render();
-}
-
-function printInvoice(b){
-let w=window.open("");
-w.document.write(`
-<h2>HOÁ ĐƠN</h2>
-Khách: ${b.customer}<br>
-Sản phẩm: ${b.item}<br>
-Số mét: ${b.qty}<br>
-Tổng tiền: ${b.total}<br>
-Thời gian: ${new Date(b.time).toLocaleString()}
-`);
-w.print();
-}
-
+/* RENDER */
 function render(){
-stockList.innerHTML="";
-sellSKU.innerHTML="";
-sellCustomer.innerHTML="";
-customerList.innerHTML="";
-reportBox.innerHTML="";
+stock.innerHTML="";
+product.innerHTML="";
+customer.innerHTML="";
+cusList.innerHTML="";
 
-let today=0,month=0,profit=0;
-let now=new Date();
+let revenue=0;
 
 skus.forEach((s,i)=>{
-stockList.innerHTML+=`<div class="item">${s.name}-${s.color} | ${s.stock.toFixed(2)}m</div>`;
-sellSKU.innerHTML+=`<option value="${i}">${s.name}-${s.color}</option>`;
+stock.innerHTML+=`<div class="item">${s.name}-${s.color} | ${s.stock}m</div>`;
+product.innerHTML+=`<option value="${i}">${s.name}-${s.color}</option>`;
 });
 
 customers.forEach((c,i)=>{
-sellCustomer.innerHTML+=`<option value="${i}">${c.name}</option>`;
-customerList.innerHTML+=`<div class="item">${c.name} - Nợ:${c.debt}
-<button onclick="pay(${i})">Trả</button></div>`;
+customer.innerHTML+=`<option value="${i}">${c.name}</option>`;
+cusList.innerHTML+=`<div class="item">${c.name} - Nợ:${c.debt}</div>`;
 });
 
-invoices.forEach(inv=>{
-let d=new Date(inv.time);
-if(d.toDateString()==now.toDateString()) today+=inv.total;
-if(d.getMonth()==now.getMonth()) month+=inv.total;
-profit+=inv.profit;
-});
+bills.forEach(b=>revenue+=b.total);
 
-today?today:0;
-
-document.getElementById("today").innerText=today;
-document.getElementById("month").innerText=month;
-document.getElementById("profit").innerText=profit;
+dash.innerHTML=`
+Doanh thu: ${revenue}<br>
+Số đơn: ${bills.length}
+`;
 
 reportBox.innerHTML=`
-Doanh thu hôm nay: ${today}<br>
-Doanh thu tháng: ${month}<br>
-Tổng lãi: ${profit}<br>
-Số hoá đơn: ${invoices.length}
+Doanh thu: ${revenue}<br>
+Số đơn: ${bills.length}
 `;
-}
-
-function pay(i){
-let m=prompt("Tiền trả");
-if(!m) return;
-customers[i].debt-=+m;
-save();render();
 }
 
 addRow();
